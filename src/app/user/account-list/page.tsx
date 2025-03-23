@@ -7,11 +7,7 @@ import { api } from "@/trpc/react";
 
 export default function AccountList() {
   const session = useSession();
-  const {
-    data: accounts,
-    isPending,
-    isError,
-  } = api.account.getAccountList.useQuery({
+  const { data: accounts, isPending } = api.account.getAccountList.useQuery({
     user_id: session?.data?.user.id ?? "",
   });
 
