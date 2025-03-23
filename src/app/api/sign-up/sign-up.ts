@@ -1,5 +1,5 @@
 import { authClient } from "@/lib/auth-client"; //import the auth client
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 
 interface SignUpProps {
@@ -12,6 +12,7 @@ interface SignUpProps {
 }
 
 export default function useSignUp() {
+  const router = useRouter();
   const SignUp = async ({
     setIsLoading,
     setErrorMessage,
@@ -68,13 +69,15 @@ export default function useSignUp() {
           setIsLoading(true);
         },
         onSuccess: () => {
-          redirect("/user/dashboard");
+          router.push("/user/dashboard");
+          router.refresh();
+          setIsLoading(false);
         },
         onError: (ctx) => {
           setErrorMessage(ctx.error.message);
           setIsLoading(false);
         },
-      }
+      },
     );
     return { data, error };
   };

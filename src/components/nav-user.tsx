@@ -24,11 +24,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Session } from "@/lib/auth";
+import { type Session } from "@/lib/auth";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import useSignOut from "@/app/api/sign-out/sign-out";
 import { useState } from "react";
+import { EditProfile } from "./edit-profile";
 
 export function NavUser({ session }: Readonly<{ session: Session | null }>) {
   const { isMobile } = useSidebar();
@@ -41,44 +42,44 @@ export function NavUser({ session }: Readonly<{ session: Session | null }>) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
-                size='lg'
-                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <Avatar className='h-8 w-8 rounded-lg grayscale'>
-                  <AvatarImage src={"@/app/assets/chad.jpg"} alt='tes' />
-                  <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+                <Avatar className="h-8 w-8 rounded-lg grayscale">
+                  <AvatarImage src={"@/app/assets/chad.jpg"} alt="tes" />
+                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
-                <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-medium'>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">
                     {session?.user.name}
                   </span>
-                  <span className='text-muted-foreground truncate text-xs'>
+                  <span className="text-muted-foreground truncate text-xs">
                     {session?.user.email}
                   </span>
                 </div>
-                <IconDotsVertical className='ml-auto size-4' />
+                <IconDotsVertical className="ml-auto size-4" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
+              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
               side={isMobile ? "bottom" : "right"}
-              align='end'
+              align="end"
               sideOffset={4}
             >
-              <DropdownMenuLabel className='p-0 font-normal'>
-                <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
-                  <Avatar className='h-8 w-8 rounded-lg'>
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
                       src={"@/app/assets/chad.jpg"}
                       alt={session?.user.name}
                     />
-                    <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
-                  <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-medium'>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">
                       {session?.user.name}
                     </span>
-                    <span className='text-muted-foreground truncate text-xs'>
+                    <span className="text-muted-foreground truncate text-xs">
                       {session?.user.email}
                     </span>
                   </div>
@@ -86,10 +87,7 @@ export function NavUser({ session }: Readonly<{ session: Session | null }>) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <IconUserCircle />
-                  Account
-                </DropdownMenuItem>
+                <EditProfile session={session} />
                 <DropdownMenuItem>
                   <IconCreditCard />
                   Billing
@@ -101,20 +99,20 @@ export function NavUser({ session }: Readonly<{ session: Session | null }>) {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <IconLogout />
                 <Button
                   onClick={() => signOut({ setIsLoading })}
                   disabled={isLoading}
                 >
-                  Log out
+                  <IconLogout />
+                  Sign out
                 </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           <Link href={"/auth/login"}>
-            <SidebarMenuButton size='lg'>
-              <IconUserCircle className='size-4' />
+            <SidebarMenuButton size="lg">
+              <IconUserCircle className="size-4" />
               Sign in
             </SidebarMenuButton>
           </Link>

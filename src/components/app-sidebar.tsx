@@ -33,7 +33,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { Session } from "@/lib/auth";
+import { type Session } from "@/lib/auth";
 
 const data = {
   user: {
@@ -164,10 +164,10 @@ export function AppSidebar({ session, ...props }: Readonly<AppSidebarProps>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <Link href="#">
-                <IconDatabaseDollar className="!size-5" />
+                <IconDatabaseDollar className="size-5!" />
                 <span className="text-base font-semibold">MyFinance</span>
               </Link>
             </SidebarMenuButton>
