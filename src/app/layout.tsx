@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { TRPCReactProvider } from "@/trpc/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,10 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
   return (
     <html
       lang="en"
@@ -41,28 +32,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider
-          style={
-            {
-              "--sidebar-width": "calc(var(--spacing) * 72)",
-              "--header-height": "calc(var(--spacing) * 12)",
-            } as React.CSSProperties
-          }
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AppSidebar variant="inset" session={session} />
-            <SidebarInset>
-              <SiteHeader session={session} />
-
-              {children}
-            </SidebarInset>
-          </ThemeProvider>
-        </SidebarProvider>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>
   );
