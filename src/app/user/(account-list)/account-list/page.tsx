@@ -4,6 +4,7 @@ import { CreateAccount } from "@/components/create-account";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
 import { api } from "@/trpc/react";
+import Link from "next/link";
 
 export default function AccountList() {
   const session = useSession();
@@ -21,7 +22,9 @@ export default function AccountList() {
         <div className="flex flex-row flex-wrap justify-center gap-5 p-5">
           <CreateAccount user_id={session?.data?.user.id} />
           {accounts?.map((account) => (
-            <AccountCard key={account.id} {...account} />
+            <Link key={account.id} href={`/user/dashboard/${account.id}`}>
+              <AccountCard key={account.id} {...account} />
+            </Link>
           ))}
         </div>
       )}

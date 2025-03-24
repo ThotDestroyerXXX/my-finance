@@ -10,15 +10,18 @@ import {
   CardFooter,
 } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { currency } from "@/lib/utils";
 
 const AccountCard = (account: accountProps) => {
   return (
     <Card className="@container/card flex h-[10rem] w-[20rem] flex-col justify-center gap-1 text-justify">
       <CardHeader>
-        <CardDescription>{account.name}</CardDescription>
+        <CardDescription className="text-foreground text-base">
+          {account.name}
+        </CardDescription>
         <CardTitle className="text-base font-semibold tabular-nums @[250px]/card:text-2xl">
           {account.currency_type}
-          {account.balance}
+          {currency(Number(account.balance))}
         </CardTitle>
         <CardAction>
           <Badge variant="outline">

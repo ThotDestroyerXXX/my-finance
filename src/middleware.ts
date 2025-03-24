@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/user/") && !session) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   } else if (request.nextUrl.pathname.startsWith("/auth/") && session) {
-    return NextResponse.redirect(new URL("/user/dashboard", request.url));
+    return NextResponse.redirect(new URL("/user/account-list", request.url));
   }
 }
 

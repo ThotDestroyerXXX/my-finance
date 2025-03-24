@@ -20,6 +20,28 @@ export const accountRouter = createTRPCRouter({
   getAccountTypeList: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.select().from(user_account_type).execute();
   }),
+  getAccountByUserId: publicProcedure
+    .input(
+      z.object({
+        user_id: z.string(),
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const account = await ctx.db.query.user_account
+        .findFirst({
+          where: (fields, operators) =>
+            operators.and(
+              eq(fields.user_id, input.user_id),
+              eq(fields.id, input.account_id),
+            ),
+        })
+        .execute();
+      if (!account) {
+        return null;
+      }
+      return account;
+    }),
   createAccount: publicProcedure
     .input(
       z.object({

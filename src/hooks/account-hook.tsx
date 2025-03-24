@@ -15,7 +15,9 @@ export const fetchAllAccountTypes = () => {
 export const useCreateAccount = (
   setError: (error: string | null) => void,
   setLoading: (loading: boolean) => void,
+  setOpen: (open: boolean) => void,
 ) => {
+  const utils = api.useUtils();
   const { mutate } = api.account.createAccount.useMutation({
     onError: (error) => {
       const fieldErrors = error.data?.zodError?.fieldErrors;
@@ -28,7 +30,9 @@ export const useCreateAccount = (
     onMutate: () => {
       setLoading(true);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await utils.account.getAccountList.invalidate();
+      setOpen(false);
       setLoading(false);
     },
   });

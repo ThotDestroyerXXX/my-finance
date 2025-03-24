@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { CreateFlow } from "./create-flow";
+import { TrendingUpIcon } from "lucide-react";
 
 export function NavMain({
   items,
@@ -23,22 +24,28 @@ export function NavMain({
 }>) {
   return (
     <SidebarGroup>
-      <SidebarGroupContent className='flex flex-col gap-2'>
+      <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarMenuItem className='flex items-center gap-2'>
+          <SidebarMenuItem className="flex items-center gap-2">
             <CreateFlow />
 
             <Button
-              size='icon'
-              className='size-8 group-data-[collapsible=icon]:opacity-0'
-              variant='outline'
+              size="icon"
+              className="size-8 group-data-[collapsible=icon]:opacity-0"
+              variant="outline"
             >
               <IconMail />
-              <span className='sr-only'>Inbox</span>
+              <span className="sr-only">Inbox</span>
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <TrendingUpIcon />
+              <span>Income</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title}>

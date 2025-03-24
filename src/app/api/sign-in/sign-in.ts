@@ -26,14 +26,14 @@ export default function useSignIn() {
           setIsLoading(true);
         },
         onSuccess: () => {
-          router.push("/user/dashboard");
+          router.push("/user/account-list");
           router.refresh();
         },
         onError: () => {
           setErrorMessage("Invalid email or password");
           setIsLoading(false);
         },
-      }
+      },
     );
     return { data, error };
   };

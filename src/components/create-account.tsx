@@ -37,9 +37,10 @@ export function CreateAccount({
   >(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const createAccount = useCreateAccount(setError, setLoading);
+  const [open, setOpen] = useState<boolean>(false);
+  const createAccount = useCreateAccount(setError, setLoading, setOpen);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Card className="@container/card flex h-[10rem] w-[20rem] cursor-pointer flex-col items-center justify-center gap-1 text-center">
           <DiamondPlus className="h-7 w-7" />
@@ -49,7 +50,7 @@ export function CreateAccount({
         </Card>
       </DialogTrigger>
       {accountTypes.isPending ? (
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="flex flex-col items-center justify-center sm:max-w-[425px]">
           <DialogTitle hidden></DialogTitle>
           <Spinner />
         </DialogContent>

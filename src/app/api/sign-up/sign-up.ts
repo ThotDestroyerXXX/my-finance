@@ -69,7 +69,7 @@ export default function useSignUp() {
           setIsLoading(true);
         },
         onSuccess: () => {
-          router.push("/user/dashboard");
+          router.push("/user/account-list");
           router.refresh();
           setIsLoading(false);
         },
