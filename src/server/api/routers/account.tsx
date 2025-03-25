@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { user_account, user_account_type } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import {
+  category,
+  transaction,
+  user_account,
+  user_account_type,
+} from "@/server/db/schema";
+import { eq, sum } from "drizzle-orm";
 
 export const accountRouter = createTRPCRouter({
   getAccountList: publicProcedure
@@ -11,11 +16,15 @@ export const accountRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      return await ctx.db
-        .select()
-        .from(user_account)
-        .where(eq(user_account.user_id, input.user_id))
-        .execute();
+      try {
+        return await ctx.db
+          .select()
+          .from(user_account)
+          .where(eq(user_account.user_id, input.user_id))
+          .execute();
+      } catch {
+        throw new Error("Failed to fetch account list");
+      }
     }),
   getAccountTypeList: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.select().from(user_account_type).execute();
@@ -71,5 +80,64 @@ export const accountRouter = createTRPCRouter({
           user_id: input.user_id,
         })
         .execute();
+    }),
+  getAccountIncomeByUserId: publicProcedure
+    .input(
+      z.object({
+        user_id: z.string(),
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const account = await ctx.db
+        .select()
+        .from(transaction)
+        .innerJoin(
+          user_account,
+          eq(transaction.user_account_id, user_account.id),
+        )
+        .innerJoin(category, eq(category.id, transaction.category_id))
+        .where(
+          eq(user_account.user_id, input.user_id) &&
+            eq(user_account.id, input.account_id) &&
+            eq(transaction.transaction_type, "Income"),
+        )
+        .execute();
+      if (!account) {
+        return null;
+      }
+      return account;
+    }),
+
+  getTotalIncome: publicProcedure
+    .input(
+      z.object({
+        user_id: z.string(),
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const totalIncome = await ctx.db
+        .select({ totalIncome: sum(transaction.amount) })
+        .from(transaction)
+        .innerJoin(
+          user_account,
+          eq(transaction.user_account_id, user_account.id),
+        )
+        .groupBy(
+          transaction.user_account_id &&
+            transaction.transaction_type &&
+            user_account.user_id,
+        )
+        .where(
+          eq(user_account.user_id, input.user_id) &&
+            eq(user_account.id, input.account_id) &&
+            eq(transaction.transaction_type, "Income"),
+        )
+        .execute();
+      if (!totalIncome) {
+        return null;
+      }
+      return totalIncome;
     }),
 });

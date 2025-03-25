@@ -74,3 +74,20 @@ export const useCreateAccount = (
 
   return createAccount;
 };
+
+export const fetchAccountByUserId = (user_id: string, account_id: string) => {
+  const {
+    data: account,
+    isPending,
+    isFetched,
+  } = api.account.getAccountByUserId.useQuery(
+    {
+      user_id: user_id ?? "",
+      account_id: account_id ?? "",
+    },
+    {
+      enabled: !!account_id && !!user_id,
+    },
+  );
+  return { account, isPending, isFetched };
+};

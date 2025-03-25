@@ -1,26 +1,16 @@
 import { authClient } from "@/lib/auth-client"; //import the auth client
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { z } from "zod";
 
 interface SignUpProps {
   setIsLoading: (isLoading: boolean) => void;
-  setErrorMessage: (errorMessage: string | undefined) => void;
-  setNameError: (nameError: string | undefined) => void;
-  setEmailError: (emailError: string | undefined) => void;
-  setPasswordError: (passwordError: string | undefined) => void;
   e: React.FormEvent<HTMLFormElement>;
 }
 
 export default function useSignUp() {
   const router = useRouter();
-  const SignUp = async ({
-    setIsLoading,
-    setErrorMessage,
-    setNameError,
-    setEmailError,
-    setPasswordError,
-    e,
-  }: SignUpProps) => {
+  const SignUp = async ({ setIsLoading, e }: SignUpProps) => {
     e.preventDefault();
     setIsLoading(true);
     const form = new FormData(e.currentTarget);
@@ -51,9 +41,9 @@ export default function useSignUp() {
     });
     if (!result.success) {
       const errors = result.error.format();
-      setNameError(errors.name?._errors[0] ?? undefined);
-      setEmailError(errors.email?._errors[0] ?? undefined);
-      setPasswordError(errors.password?._errors[0] ?? undefined);
+      toast.error(errors.name?._errors[0] ?? undefined);
+      toast.error(errors.email?._errors[0] ?? undefined);
+      toast.error(errors.password?._errors[0] ?? undefined);
       setIsLoading(false);
       return;
     }
@@ -74,7 +64,7 @@ export default function useSignUp() {
           setIsLoading(false);
         },
         onError: (ctx) => {
-          setErrorMessage(ctx.error.message);
+          toast.error(ctx.error.message);
           setIsLoading(false);
         },
       },

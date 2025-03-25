@@ -5,7 +5,6 @@ import {
   IconDotsVertical,
   IconLogout,
   IconNotification,
-  IconUserCircle,
 } from "@tabler/icons-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,11 +24,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { type Session } from "@/lib/auth";
-import Link from "next/link";
 import { Button } from "./ui/button";
 import useSignOut from "@/app/api/sign-out/sign-out";
 import { useState } from "react";
 import { EditProfile } from "./edit-profile";
+import { Skeleton } from "./ui/skeleton";
 
 export function NavUser({ session }: Readonly<{ session: Session | null }>) {
   const { isMobile } = useSidebar();
@@ -110,12 +109,10 @@ export function NavUser({ session }: Readonly<{ session: Session | null }>) {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Link href={"/auth/login"}>
-            <SidebarMenuButton size="lg">
-              <IconUserCircle className="size-4" />
-              Sign in
-            </SidebarMenuButton>
-          </Link>
+          <div className="flex flex-row gap-4">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-full w-full" />
+          </div>
         )}
       </SidebarMenuItem>
     </SidebarMenu>

@@ -18,9 +18,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
   const [loading, setLoading] = useState<boolean>(false);
   const { signIn } = useSignIn();
   return (
@@ -38,67 +35,61 @@ export function LoginForm({
               signIn({
                 e,
                 setIsLoading: setLoading,
-                setErrorMessage: setErrorMessage,
               })
             }
           >
-            <div className='flex flex-col gap-6'>
-              <div className='grid gap-3'>
-                <Label htmlFor='email'>Email</Label>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-3">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id='email'
-                  name='email'
-                  type='email'
-                  placeholder='m@example.com'
-                  required
+                  id="email"
+                  name="email"
+                  type="text"
+                  placeholder="m@example.com"
                   disabled={loading}
                 />
               </div>
-              <div className='grid gap-3'>
-                <div className='flex items-center'>
-                  <Label htmlFor='password'>Password</Label>
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
                   <Link
-                    href='#'
-                    className='ml-auto inline-block text-sm underline-offset-4 hover:underline'
+                    href="#"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
                   </Link>
                 </div>
                 <Input
-                  id='password'
-                  name='password'
-                  type='password'
-                  required
+                  id="password"
+                  name="password"
+                  type="password"
                   disabled={loading}
                 />
               </div>
-              <div className='flex flex-row gap-2'>
+              <div className="flex flex-row gap-2">
                 <input
-                  id='rememberMe'
-                  name='rememberMe'
-                  type='checkbox'
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
                   disabled={loading}
-                  className='w-4 h-4'
+                  className="h-4 w-4"
                 />
-                <Label htmlFor='rememberMe'>Remember Me</Label>
+                <Label htmlFor="rememberMe">Remember Me</Label>
               </div>
-              <div className='text-center'>
-                <span className='text-red-500'>{errorMessage ?? ""}</span>
-              </div>
-              <div className='flex flex-col gap-3'>
-                <Button type='submit' className='w-full' disabled={loading}>
+              <div className="flex flex-col gap-3">
+                <Button type="submit" className="w-full" disabled={loading}>
                   Login
                 </Button>
-                <Button variant='outline' className='w-full' disabled={loading}>
+                <Button variant="outline" className="w-full" disabled={loading}>
                   Login with Google
                 </Button>
               </div>
             </div>
-            <div className='mt-4 text-center text-sm'>
+            <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link
-                href='/auth/register'
-                className='underline underline-offset-4'
+                href="/auth/register"
+                className="underline underline-offset-4"
               >
                 Register
               </Link>

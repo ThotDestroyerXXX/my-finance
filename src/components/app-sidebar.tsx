@@ -154,9 +154,14 @@ const data = {
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: Session | null;
+  account_id: string;
 }
 
-export function AppSidebar({ session, ...props }: Readonly<AppSidebarProps>) {
+export function AppSidebar({
+  session,
+  account_id,
+  ...props
+}: Readonly<AppSidebarProps>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -177,7 +182,7 @@ export function AppSidebar({ session, ...props }: Readonly<AppSidebarProps>) {
       <SidebarContent>
         {/* {session?.session && (
           <> */}
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} account_id={account_id} />
         <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
         {/* </>

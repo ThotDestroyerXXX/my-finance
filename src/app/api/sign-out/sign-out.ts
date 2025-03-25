@@ -23,8 +23,6 @@ export default function useSignOut() {
       });
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsLoading(false);
     }
   };
   return { signOut };

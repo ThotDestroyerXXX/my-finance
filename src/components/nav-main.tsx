@@ -12,15 +12,18 @@ import {
 } from "@/components/ui/sidebar";
 import { CreateFlow } from "./create-flow";
 import { TrendingUpIcon } from "lucide-react";
+import Link from "next/link";
 
 export function NavMain({
   items,
+  account_id,
 }: Readonly<{
   items: {
     title: string;
     url: string;
     icon?: Icon;
   }[];
+  account_id: string;
 }>) {
   return (
     <SidebarGroup>
@@ -40,12 +43,14 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <TrendingUpIcon />
-              <span>Income</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          <Link href={`/user/dashboard/${account_id}/income`}>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <TrendingUpIcon />
+                <span>Income</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Link>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title}>

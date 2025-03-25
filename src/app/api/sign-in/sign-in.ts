@@ -1,15 +1,15 @@
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface SignInProps {
   e: React.FormEvent<HTMLFormElement>;
   setIsLoading: (isLoading: boolean) => void;
-  setErrorMessage: (errorMessage: string | undefined) => void;
 }
 
 export default function useSignIn() {
   const router = useRouter();
-  const signIn = async ({ e, setIsLoading, setErrorMessage }: SignInProps) => {
+  const signIn = async ({ e, setIsLoading }: SignInProps) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const email = form.get("email") as string;
@@ -30,7 +30,7 @@ export default function useSignIn() {
           router.refresh();
         },
         onError: () => {
-          setErrorMessage("Invalid email or password");
+          toast.error("Invalid email or password");
           setIsLoading(false);
         },
       },

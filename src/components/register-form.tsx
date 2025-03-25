@@ -18,15 +18,7 @@ export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
   const [loading, setLoading] = useState<boolean>(false);
-  const [nameError, setNameError] = useState<string | undefined>(undefined);
-  const [emailError, setEmailError] = useState<string | undefined>(undefined);
-  const [passwordError, setPasswordError] = useState<string | undefined>(
-    undefined
-  );
   const { SignUp } = useSignUp();
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -43,66 +35,53 @@ export function RegisterForm({
               SignUp({
                 e,
                 setIsLoading: setLoading,
-                setErrorMessage: setErrorMessage,
-                setNameError: setNameError,
-                setEmailError: setEmailError,
-                setPasswordError: setPasswordError,
               })
             }
           >
-            <div className='flex flex-col gap-6'>
-              <div className='grid gap-3'>
-                <Label htmlFor='name'>Name</Label>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-3">
+                <Label htmlFor="name">Name</Label>
                 <Input
-                  id='name'
-                  name='name'
-                  type='text'
-                  placeholder='username'
-                  required
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="username"
                   disabled={loading}
                 />
-                <span className='text-red-500 text-sm'>{nameError}</span>
               </div>
-              <div className='grid gap-3'>
-                <Label htmlFor='email'>Email</Label>
+              <div className="grid gap-3">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id='email'
-                  name='email'
-                  type='email'
-                  placeholder='m@example.com'
-                  required
+                  id="email"
+                  name="email"
+                  type="text"
+                  placeholder="m@example.com"
                   disabled={loading}
                 />
-                <span className='text-red-500 text-sm'>{emailError}</span>
               </div>
-              <div className='grid gap-3'>
-                <div className='flex items-center'>
-                  <Label htmlFor='password'>Password</Label>
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
                 </div>
                 <Input
-                  id='password'
-                  name='password'
-                  type='password'
-                  required
+                  id="password"
+                  name="password"
+                  type="password"
                   disabled={loading}
                 />
-                <span className='text-red-500 text-sm'>{passwordError}</span>
               </div>
-              <div className='text-center'>
-                <span className='text-red-500 text-sm'>{errorMessage}</span>
-              </div>
-              <div className='flex flex-col gap-3'>
-                <Button type='submit' className='w-full' disabled={loading}>
+              <div className="flex flex-col gap-3">
+                <Button type="submit" className="w-full" disabled={loading}>
                   Register
                 </Button>
-                <Button variant='outline' className='w-full' disabled={loading}>
+                <Button variant="outline" className="w-full" disabled={loading}>
                   Login with Google
                 </Button>
               </div>
             </div>
-            <div className='mt-4 text-center text-sm'>
+            <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              <Link href='/auth/login' className='underline underline-offset-4'>
+              <Link href="/auth/login" className="underline underline-offset-4">
                 Login
               </Link>
             </div>
