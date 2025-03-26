@@ -1,6 +1,8 @@
 import { api } from "@/trpc/react";
 import { getParamByISO } from "iso-country-currency";
 import { redirect } from "next/navigation";
+import type React from "react";
+import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
 export const fetchAllAccountTypes = () => {
@@ -90,4 +92,53 @@ export const fetchAccountByUserId = (user_id: string, account_id: string) => {
     },
   );
   return { account, isPending, isFetched };
+};
+
+export const handleSubmitCreateIncome = (
+  setIsLoading: (loading: boolean) => void,
+  setOpen: (open: boolean) => void,
+) => {
+  const utils = api.useUtils();
+  const { mutate } = api.account.createIncome.useMutation({
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onError: (error) => {
+      const errorMessages = error.data?.zodError?.fieldErrors
+        ? Object.values(error.data.zodError.fieldErrors).flat()
+        : [error.message];
+      errorMessages.forEach((msg) => toast.error(msg));
+      setIsLoading(false);
+    },
+    onSuccess: async () => {
+      await utils.account.getAccountIncomeByUserId.invalidate();
+      setOpen(false);
+      setIsLoading(false);
+    },
+  });
+  const createIncome = (
+    e: React.FormEvent<HTMLFormElement>,
+    selectedDate: Date | null,
+    accountId: string,
+  ) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const amount = form.get("amount") as string;
+    const description = form.get("description") as string;
+    const category_id = form.get("category") as string;
+    const date = selectedDate ?? new Date();
+    const transactionType = form.get("transaction_type") as string;
+    const id = uuidv4();
+
+    mutate({
+      id,
+      amount: amount,
+      description,
+      account_id: accountId,
+      category_id: category_id,
+      date: date,
+      transaction_type: transactionType,
+    });
+  };
+  return { createIncome };
 };

@@ -1,4 +1,4 @@
-import { type user_account } from "@/server/db/schema";
+import { type user_account, type transaction } from "@/server/db/schema";
 
 export enum TransactionType {
   Income = "Income",
@@ -6,6 +6,8 @@ export enum TransactionType {
 }
 
 export type accountProps = typeof user_account.$inferSelect;
+
+export type incomeProps = typeof transaction.$inferSelect;
 
 export interface ComboboxProps {
   values: string[] | undefined;

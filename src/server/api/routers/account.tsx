@@ -6,7 +6,8 @@ import {
   user_account,
   user_account_type,
 } from "@/server/db/schema";
-import { eq, sum } from "drizzle-orm";
+import { desc, eq, sum } from "drizzle-orm";
+import { toast } from "sonner";
 
 export const accountRouter = createTRPCRouter({
   getAccountList: publicProcedure
@@ -102,6 +103,7 @@ export const accountRouter = createTRPCRouter({
             eq(user_account.id, input.account_id) &&
             eq(transaction.transaction_type, "Income"),
         )
+        .orderBy(desc(transaction.transaction_date))
         .execute();
       if (!account) {
         return null;
@@ -139,5 +141,61 @@ export const accountRouter = createTRPCRouter({
         return null;
       }
       return totalIncome;
+    }),
+
+  createIncome: publicProcedure
+    .input(
+      z.object({
+        id: z.string().nonempty("id not found"),
+        amount: z.string().nonempty("amount not found"),
+        description: z
+          .string()
+          .max(500, "description must be less than 500 characters"),
+        account_id: z.string(),
+        category_id: z.string().nonempty("category not found"),
+        date: z.date().max(new Date(), "date must be today or before"),
+        transaction_type: z.string().nonempty("transaction type not found"),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        if (
+          input.transaction_type !== "Income" &&
+          input.transaction_type !== "Expense"
+        ) {
+          throw new Error("Transaction type must be either Income or Expense");
+        }
+        if (isNaN(parseInt(input.amount))) {
+          throw new Error("Amount must be a number");
+        }
+        if (parseInt(input.amount) <= 0) {
+          throw new Error("Amount must be greater than 0");
+        }
+        if (isNaN(parseInt(input.category_id))) {
+          throw new Error("Category not found");
+        }
+
+        return await ctx.db
+          .insert(transaction)
+          .values({
+            id: input.id,
+            amount: input.amount,
+            description: input.description,
+            transaction_date: input.date.toLocaleDateString(),
+            transaction_type: input.transaction_type,
+            category_id: parseInt(input.category_id),
+            user_account_id: input.account_id,
+          })
+          .execute();
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          toast.error(e.errors?.[0]?.message);
+          throw new Error(e.errors.map((issue) => issue.message).join(", "));
+        }
+        if (e instanceof Error) {
+          throw new Error(e.message);
+        }
+        throw new Error("An unknown error occurred");
+      }
     }),
 });

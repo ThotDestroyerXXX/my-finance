@@ -37,7 +37,7 @@ export default async function RootLayout({
         <TRPCReactProvider>
           <HydrationBoundary>
             {children}
-            <Toaster richColors />
+            <Toaster richColors expand={true} visibleToasts={6} />
           </HydrationBoundary>
         </TRPCReactProvider>
       </body>

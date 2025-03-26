@@ -139,7 +139,7 @@ export const monthly_budget = pgTable("monthly_budget", {
 });
 
 export const transaction = pgTable("transaction", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().notNull(),
   amount: decimal("amount", { scale: 2 }).notNull(),
   description: text("description"),
   transaction_date: date("transaction_date").notNull(),
