@@ -49,7 +49,7 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          <Link href={`/user/dashboard/${account_id}`}>
+          <Link href={`/user/dashboard/${account_id}`} prefetch={true} shallow>
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <IconDashboard />
@@ -57,7 +57,11 @@ export function NavMain({
               </SidebarMenuButton>
             </SidebarMenuItem>
           </Link>
-          <Link href={`/user/dashboard/${account_id}/income`}>
+          <Link
+            href={`/user/dashboard/${account_id}/income`}
+            prefetch={true}
+            shallow
+          >
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <TrendingUpIcon />
@@ -65,7 +69,11 @@ export function NavMain({
               </SidebarMenuButton>
             </SidebarMenuItem>
           </Link>
-          <Link href={`/user/dashboard/${account_id}/expense`}>
+          <Link
+            href={`/user/dashboard/${account_id}/expense`}
+            prefetch={true}
+            shallow
+          >
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <TrendingDownIcon />

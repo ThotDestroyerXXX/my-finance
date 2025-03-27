@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { TRPCReactProvider } from "@/trpc/react";
-import { HydrationBoundary } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
+import { HydrateClient } from "@/trpc/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,10 +34,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TRPCReactProvider>
-          <HydrationBoundary>
+          <HydrateClient>
             {children}
             <Toaster richColors expand={true} visibleToasts={6} />
-          </HydrationBoundary>
+          </HydrateClient>
         </TRPCReactProvider>
       </body>
     </html>
