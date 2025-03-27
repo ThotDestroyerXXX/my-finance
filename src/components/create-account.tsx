@@ -35,14 +35,13 @@ export function CreateAccount({
   const [selectedCurrencyType, setSelectedCurrencyType] = useState<
     string | null
   >(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const createAccount = useCreateAccount(setError, setLoading, setOpen);
+  const createAccount = useCreateAccount(setLoading, setOpen);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Card className="@container/card flex h-[10rem] w-[20rem] cursor-pointer flex-col items-center justify-center gap-1 text-center">
+        <Card className="@container/card flex w-[20rem] cursor-pointer flex-col items-center justify-center gap-1 text-center">
           <DiamondPlus className="h-7 w-7" />
           <CardDescription className="text-foreground text-base">
             Add Account
@@ -125,7 +124,6 @@ export function CreateAccount({
                   onSelect={(value) => setSelectedAccountType(value)}
                 />
               </div>
-              <span className="text-sm text-red-500">{error}</span>
             </div>
             <DialogFooter hidden={accountTypes.isPending}>
               <Button type="submit" disabled={loading}>

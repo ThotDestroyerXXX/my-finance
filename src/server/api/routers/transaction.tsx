@@ -127,8 +127,13 @@ export const transactionRouter = createTRPCRouter({
         if (isNaN(Number(input.amount))) {
           throw new Error("Amount must be a number");
         }
-        if (Number(input.amount) <= 0) {
-          throw new Error("Amount must be greater than 0");
+        if (
+          Number(input.amount) <= 0 ||
+          Number(input.amount) >= 1000000000000000
+        ) {
+          throw new Error(
+            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
+          );
         }
         if (isNaN(Number(input.category_id))) {
           throw new Error("Category not found");
@@ -143,11 +148,11 @@ export const transactionRouter = createTRPCRouter({
         if (!acc) {
           throw new Error("Account not found");
         }
-        let newBalance = 0;
+        let newBalance = BigInt(0);
         if (input.transaction_type === "Income") {
-          newBalance = Number(acc.balance) + Number(input.amount);
+          newBalance = BigInt(acc.balance) + BigInt(input.amount);
         } else if (input.transaction_type === "Expense") {
-          newBalance = Number(acc.balance) - Number(input.amount);
+          newBalance = BigInt(acc.balance) - BigInt(input.amount);
           if (newBalance < 0) {
             throw new Error("Insufficient balance");
           }

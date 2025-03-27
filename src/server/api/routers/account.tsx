@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { user_account, user_account_type } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { toast } from "sonner";
 
 export const accountRouter = createTRPCRouter({
   getAccountList: publicProcedure
@@ -64,16 +65,36 @@ export const accountRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return ctx.db
-        .insert(user_account)
-        .values({
-          id: input.id,
-          name: input.name,
-          balance: input.balance,
-          currency_type: input.currency_type,
-          user_account_type_id: input.user_account_type_id,
-          user_id: input.user_id,
-        })
-        .execute();
+      try {
+        if (isNaN(Number(input.balance))) {
+          throw new Error("Balance must be a number!");
+        }
+        if (Number(input.balance) < 0) {
+          throw new Error("Balance must be greater than 0!");
+        }
+        if (Number(input.balance) >= 1000000000000000) {
+          throw new Error("Balance must be less than 1.000.000.000.000.000");
+        }
+        return ctx.db
+          .insert(user_account)
+          .values({
+            id: input.id,
+            name: input.name,
+            balance: input.balance,
+            currency_type: input.currency_type,
+            user_account_type_id: input.user_account_type_id,
+            user_id: input.user_id,
+          })
+          .execute();
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          toast.error(e.errors?.[0]?.message);
+          throw new Error(e.errors.map((issue) => issue.message).join(", "));
+        }
+        if (e instanceof Error) {
+          throw new Error(e.message);
+        }
+        throw new Error("An unknown error occurred");
+      }
     }),
 });

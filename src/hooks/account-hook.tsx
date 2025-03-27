@@ -15,18 +15,16 @@ export const fetchAllAccountTypes = () => {
 };
 
 export const useCreateAccount = (
-  setError: (error: string | null) => void,
   setLoading: (loading: boolean) => void,
   setOpen: (open: boolean) => void,
 ) => {
   const utils = api.useUtils();
   const { mutate } = api.account.createAccount.useMutation({
     onError: (error) => {
-      const fieldErrors = error.data?.zodError?.fieldErrors;
-      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-        const firstKey = Object.keys(fieldErrors)[0]!;
-        setError(fieldErrors[firstKey]?.[0] ?? null);
-      }
+      const errorMessages = error.data?.zodError?.fieldErrors
+        ? Object.values(error.data.zodError.fieldErrors).flat()
+        : [error.message];
+      errorMessages.forEach((msg) => toast.error(msg));
       setLoading(false);
     },
     onMutate: () => {
@@ -48,7 +46,7 @@ export const useCreateAccount = (
     selectedCurrencyType: string | null,
   ) => {
     e.preventDefault();
-
+    setLoading(true);
     if (!user_id) {
       redirect("/auth/login");
     }
@@ -58,7 +56,8 @@ export const useCreateAccount = (
     const balance = form.get("balance") as string;
 
     if (!name || !balance || !selectedAccountType || !selectedCurrencyType) {
-      setError("All fields are required");
+      toast.error("Please fill in all fields");
+      setLoading(false);
       return;
     }
 
@@ -71,7 +70,7 @@ export const useCreateAccount = (
       user_id,
       name,
       balance: balance,
-      user_account_type_id: parseInt(selectedAccountType ?? "-1"),
+      user_account_type_id: Number(selectedAccountType ?? "-1"),
       currency_type: symbol,
     });
   };

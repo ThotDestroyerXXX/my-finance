@@ -36,14 +36,14 @@ export default function TransactionTable({
         <Skeleton className="h-[20rem] w-full" />
       ) : (
         <>
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4 max-[25rem]:flex-col">
             <AddTransaction user_id={user_id} account_id={account_id} />
             <Select
               name="filter_date"
               defaultValue="30"
               onValueChange={(value) => setFilterDate(Number(value))}
             >
-              <SelectTrigger className="min-w-48">
+              <SelectTrigger className="min-w-40 max-[25rem]:w-full">
                 <SelectValue placeholder="Transaction Type" />
               </SelectTrigger>
               <SelectContent>
