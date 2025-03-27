@@ -8,3 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function currency(value: number) {
   return new Intl.NumberFormat().format(value);
 }
+
+export function calculateBar(value: string | 0 | undefined, total: string) {
+  return (Number(value) / Number(total)) * 100;
+}

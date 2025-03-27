@@ -1,33 +1,98 @@
+"use client";
 import BalanceCard from "@/components/balance-card";
 import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 import data from "../data.json";
-import { paramHook } from "@/hooks/server-hook";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { api } from "@/trpc/react";
+import Spinner from "@/components/ui/spinner";
 
-export default async function Page({
+export default function Page({
   params,
 }: Readonly<{
   params: Promise<{ id: string }>;
 }>) {
-  const { session, param } = await paramHook(params);
-  if (!session || !param) {
+  const [param, setParam] = useState<{ id: string } | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  useEffect(() => {
+    const fetchParam = async () => {
+      return await params;
+    };
+    fetchParam()
+      .then((param) => {
+        setParam(param);
+      })
+      .catch(() => {
+        setParam(null);
+      });
+  }, [params]);
+
+  const { data: session } = authClient.useSession();
+
+  const {
+    data: account,
+    isPending,
+    isFetched,
+  } = api.account.getAccountByUserId.useQuery(
+    {
+      user_id: session?.user.id ?? "",
+      account_id: param?.id ?? "",
+    },
+    {
+      enabled: !!param?.id && !!session?.user.id,
+    },
+  );
+  const { data: monthlyBudget } = api.budget.getMonthlyBudget.useQuery(
+    {
+      user_account_id: param?.id ?? "",
+    },
+    {
+      enabled: !!param?.id,
+    },
+  );
+
+  const { data: monthlyExpense } = api.transaction.getMonthlyExpense.useQuery(
+    {
+      account_id: param?.id ?? "",
+    },
+    {
+      enabled: !!param?.id,
+    },
+  );
+
+  if (
+    (!param?.id || !session?.user.id || !account) &&
+    !isPending &&
+    isFetched
+  ) {
     toast.error("Account not found");
     redirect("/user/account-list");
   } else {
     return (
-      <div className="flex flex-1 flex-col">
-        <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-            <div className="px-4 lg:px-6">
-              <BalanceCard param={param} session={session} />
+      <>
+        {loading && <Spinner />}
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <div className="px-4 lg:px-6">
+                <BalanceCard
+                  account={account}
+                  isPending={isPending}
+                  isFetched={isFetched}
+                  setLoading={setLoading}
+                  monthlyBudget={monthlyBudget}
+                  monthlyExpense={monthlyExpense}
+                />
+              </div>
+              <SectionCards />
+              <DataTable data={data} />
             </div>
-            <SectionCards />
-            <DataTable data={data} />
           </div>
         </div>
-      </div>
+      </>
     );
   }
 }

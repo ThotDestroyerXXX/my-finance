@@ -7,7 +7,7 @@ import { api } from "@/trpc/react";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export default function Income({
+export default function Expense({
   params,
 }: Readonly<{
   params: Promise<{ id: string }>;
@@ -29,10 +29,10 @@ export default function Income({
 
   const session = authClient.useSession();
   const {
-    data: incomes,
+    data: expenses,
     isPending,
     isFetched,
-  } = api.transaction.getAccountIncomeByUserId.useQuery(
+  } = api.transaction.getAccountExpenseByUserId.useQuery(
     {
       user_id: session.data?.user.id ?? "",
       account_id: param?.id ?? "",
@@ -42,7 +42,7 @@ export default function Income({
     },
   );
   if (
-    (!param?.id || !session.data?.user.id || !incomes) &&
+    (!param?.id || !session.data?.user.id || !expenses) &&
     !isPending &&
     isFetched
   ) {
@@ -51,12 +51,12 @@ export default function Income({
     return (
       <>
         {loading && <Spinner />}
-        {(!incomes || incomes.length <= 0) &&
+        {(!expenses || expenses.length <= 0) &&
         isFetched &&
         param?.id &&
         session.data?.user.id ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <h2 className="text-xl">You don&apos;t have income Yet</h2>
+            <h2 className="text-xl">You don&apos;t have expense Yet</h2>
             <AddTransaction
               user_id={session.data.user.id}
               account_id={param.id}
@@ -65,7 +65,7 @@ export default function Income({
         ) : (
           <div className="flex h-full w-full flex-col gap-6 p-6">
             <TransactionTable
-              transactions={incomes}
+              transactions={expenses}
               isFetched={isFetched}
               isPending={isPending}
               user_id={session.data?.user.id}

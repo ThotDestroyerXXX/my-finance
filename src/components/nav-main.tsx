@@ -1,6 +1,11 @@
 "use client";
 
-import { IconMail, type Icon } from "@tabler/icons-react";
+import {
+  IconDashboard,
+  IconMail,
+  IconMoneybagEdit,
+  type Icon,
+} from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +15,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { CreateFlow } from "./create-flow";
-import { TrendingUpIcon } from "lucide-react";
 import Link from "next/link";
+import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 
 export function NavMain({
   items,
@@ -30,8 +34,10 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <CreateFlow />
-
+            <Button>
+              <IconMoneybagEdit />
+              Review Money
+            </Button>
             <Button
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"
@@ -43,11 +49,27 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
+          <Link href={`/user/dashboard/${account_id}`}>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <IconDashboard />
+                <span>Dashboard</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Link>
           <Link href={`/user/dashboard/${account_id}/income`}>
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <TrendingUpIcon />
                 <span>Income</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Link>
+          <Link href={`/user/dashboard/${account_id}/expense`}>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <TrendingDownIcon />
+                <span>Expense</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </Link>

@@ -90,7 +90,7 @@ export default function AddTransaction({
             </DialogHeader>
             <form
               onSubmit={(e) => {
-                createIncome(e, date, account_id ?? "");
+                createIncome(e, date, account_id ?? "", user_id ?? "");
               }}
             >
               <div className="flex flex-col gap-5 py-4">

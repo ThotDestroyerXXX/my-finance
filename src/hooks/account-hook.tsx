@@ -30,12 +30,14 @@ export const useCreateAccount = (
       setLoading(false);
     },
     onMutate: () => {
+      toast.info("Creating account...");
       setLoading(true);
     },
     onSuccess: async () => {
       await utils.account.getAccountList.invalidate();
       setOpen(false);
       setLoading(false);
+      toast.success("Account created successfully");
     },
   });
 
@@ -95,33 +97,39 @@ export const fetchAccountByUserId = (user_id: string, account_id: string) => {
 };
 
 export const handleSubmitCreateIncome = (
-  setIsLoading: (loading: boolean) => void,
+  setLoading: (loading: boolean) => void,
   setOpen: (open: boolean) => void,
 ) => {
   const utils = api.useUtils();
-  const { mutate } = api.account.createIncome.useMutation({
+  const { mutate } = api.transaction.createIncome.useMutation({
     onMutate: () => {
-      setIsLoading(true);
+      toast.info("Creating income...");
+      setLoading(true);
     },
     onError: (error) => {
       const errorMessages = error.data?.zodError?.fieldErrors
         ? Object.values(error.data.zodError.fieldErrors).flat()
         : [error.message];
       errorMessages.forEach((msg) => toast.error(msg));
-      setIsLoading(false);
+      setLoading(false);
     },
     onSuccess: async () => {
-      await utils.account.getAccountIncomeByUserId.invalidate();
+      await utils.transaction.invalidate();
+      await utils.account.invalidate();
+      await utils.budget.invalidate();
       setOpen(false);
-      setIsLoading(false);
+      setLoading(false);
+      toast.success("Income created successfully");
     },
   });
   const createIncome = (
     e: React.FormEvent<HTMLFormElement>,
     selectedDate: Date | null,
     accountId: string,
+    userId: string,
   ) => {
     e.preventDefault();
+    setLoading(true);
     const form = new FormData(e.currentTarget);
     const amount = form.get("amount") as string;
     const description = form.get("description") as string;
@@ -138,7 +146,35 @@ export const handleSubmitCreateIncome = (
       category_id: category_id,
       date: date,
       transaction_type: transactionType,
+      user_id: userId,
     });
   };
   return { createIncome };
+};
+
+export const deleteTransaction = (setLoading: (loading: boolean) => void) => {
+  const utils = api.useUtils();
+  const { mutate } = api.transaction.deleteTransaction.useMutation({
+    onMutate: () => {
+      setLoading(true);
+      toast.info("Deleting transaction...");
+    },
+    onError: (error) => {
+      setLoading(false);
+      toast.error(error.message);
+    },
+    onSuccess: async () => {
+      await utils.transaction.invalidate();
+      await utils.account.invalidate();
+      await utils.budget.invalidate();
+      toast.success("Transaction deleted successfully");
+      setLoading(false);
+    },
+  });
+
+  const handleDelete = (transaction_id: string, account_id: string) => {
+    mutate({ transaction_id, account_id });
+  };
+
+  return { handleDelete };
 };
