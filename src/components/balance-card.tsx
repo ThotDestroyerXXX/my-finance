@@ -46,6 +46,8 @@ const BalanceCard = ({
               <Link
                 href={`/user/dashboard/${account?.id}/income`}
                 onClick={() => setLoading(true)}
+                prefetch
+                shallow
               >
                 <Badge
                   variant="outline"
@@ -58,6 +60,8 @@ const BalanceCard = ({
               <Link
                 href={`/user/dashboard/${account?.id}/expense`}
                 onClick={() => setLoading(true)}
+                prefetch
+                shallow
               >
                 <Badge
                   variant="outline"

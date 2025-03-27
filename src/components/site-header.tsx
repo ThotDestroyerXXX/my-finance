@@ -42,7 +42,7 @@ export function SiteHeader({
               Sign Out
             </Button>
           ) : (
-            <Link href="/auth/login">
+            <Link href="/auth/login" prefetch shallow>
               <Button>Sign In</Button>
             </Link>
           )}

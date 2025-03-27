@@ -41,6 +41,8 @@ export default function AccountList() {
               key={account.id}
               href={`/user/dashboard/${account.id}`}
               onClick={() => setIsNavigating(true)}
+              prefetch
+              shallow
             >
               <AccountCard key={account.id} {...account} />
             </Link>

@@ -60,6 +60,8 @@ export function LoginForm({
                       <Link
                         href="#"
                         className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                        prefetch
+                        shallow
                       >
                         Forgot your password?
                       </Link>
@@ -99,6 +101,8 @@ export function LoginForm({
                   <Link
                     href="/auth/register"
                     className="underline underline-offset-4"
+                    prefetch
+                    shallow
                   >
                     Register
                   </Link>
