@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { api } from "@/trpc/react";
 import Spinner from "@/components/ui/spinner";
+import MonthlyBudget from "@/components/monthly-budget";
 
 export default function Page({
   params,
@@ -77,15 +78,25 @@ export default function Page({
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <div className="px-4 lg:px-6">
-                <BalanceCard
-                  account={account}
-                  isPending={isPending}
-                  isFetched={isFetched}
-                  setLoading={setLoading}
-                  monthlyBudget={monthlyBudget}
-                  monthlyExpense={monthlyExpense}
-                />
+              <div className="flex flex-row justify-between gap-4 px-4 max-lg:flex-col">
+                <div className="flex-1">
+                  <BalanceCard
+                    account={account}
+                    isPending={isPending}
+                    isFetched={isFetched}
+                    setLoading={setLoading}
+                  />
+                </div>
+                <div className="flex-1">
+                  <MonthlyBudget
+                    account={account}
+                    isPending={isPending}
+                    isFetched={isFetched}
+                    setLoading={setLoading}
+                    monthlyBudget={monthlyBudget}
+                    monthlyExpense={monthlyExpense}
+                  />
+                </div>
               </div>
               <SectionCards />
               <DataTable data={data} />

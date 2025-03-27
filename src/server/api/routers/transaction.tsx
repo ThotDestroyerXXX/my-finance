@@ -22,9 +22,11 @@ export const transactionRouter = createTRPCRouter({
         )
         .innerJoin(category, eq(category.id, transaction.category_id))
         .where(
-          eq(user_account.user_id, input.user_id) &&
-            eq(user_account.id, input.account_id) &&
+          and(
+            eq(user_account.user_id, input.user_id),
+            eq(user_account.id, input.account_id),
             eq(transaction.transaction_type, "Income"),
+          ),
         )
         .orderBy(desc(transaction.transaction_date))
         .execute();
@@ -51,9 +53,11 @@ export const transactionRouter = createTRPCRouter({
         )
         .innerJoin(category, eq(category.id, transaction.category_id))
         .where(
-          eq(user_account.user_id, input.user_id) &&
-            eq(user_account.id, input.account_id) &&
+          and(
+            eq(user_account.user_id, input.user_id),
+            eq(user_account.id, input.account_id),
             eq(transaction.transaction_type, "Expense"),
+          ),
         )
         .orderBy(desc(transaction.transaction_date))
         .execute();
@@ -84,9 +88,11 @@ export const transactionRouter = createTRPCRouter({
             user_account.user_id,
         )
         .where(
-          eq(user_account.user_id, input.user_id) &&
-            eq(user_account.id, input.account_id) &&
+          and(
+            eq(user_account.user_id, input.user_id),
+            eq(user_account.id, input.account_id),
             eq(transaction.transaction_type, "Income"),
+          ),
         )
         .execute();
       if (!totalIncome) {
