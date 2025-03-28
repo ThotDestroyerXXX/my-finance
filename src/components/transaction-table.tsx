@@ -37,7 +37,11 @@ export default function TransactionTable({
       ) : (
         <>
           <div className="flex justify-between gap-4 max-[25rem]:flex-col">
-            <AddTransaction user_id={user_id} account_id={account_id} />
+            <AddTransaction
+              user_id={user_id}
+              account_id={account_id}
+              setLoading={setLoading}
+            />
             <Select
               name="filter_date"
               defaultValue="30"
@@ -113,8 +117,9 @@ export default function TransactionTable({
                       </TableCell>
                       <DropdownDeleteEdit
                         account_id={account_id}
-                        transaction_id={transaction.transaction.id}
+                        transaction={transaction.transaction}
                         setLoading={setLoading}
+                        user_id={user_id}
                       />
                     </TableRow>
                   ))}

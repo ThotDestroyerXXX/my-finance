@@ -111,7 +111,7 @@ export const category_budget = pgTable("category_budget", {
   created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updated_at: timestamp("updated_at")
+  updated_at: timestamp("updated_at", { mode: "string" })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`)
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
@@ -129,7 +129,7 @@ export const monthly_budget = pgTable("monthly_budget", {
   created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updated_at: timestamp("updated_at")
+  updated_at: timestamp("updated_at", { mode: "string" })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`)
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
@@ -147,7 +147,7 @@ export const transaction = pgTable("transaction", {
   created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updated_at: timestamp("updated_at")
+  updated_at: timestamp("updated_at", { mode: "string" })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`)
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),

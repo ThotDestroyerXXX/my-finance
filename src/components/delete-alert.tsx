@@ -16,10 +16,12 @@ export function DeleteAlert({
   transaction_id,
   account_id,
   setLoading,
+  monthly_budget_id,
 }: Readonly<{
-  transaction_id: string;
+  transaction_id?: string;
   account_id: string | undefined;
   setLoading: (loading: boolean) => void;
+  monthly_budget_id?: string;
 }>) {
   const { handleDelete } = deleteTransaction(setLoading);
   return (
@@ -46,7 +48,17 @@ export function DeleteAlert({
             className="bg-red-600 text-white hover:bg-red-700"
             onClick={() => {
               setLoading(true);
-              handleDelete(transaction_id, account_id ?? "");
+              if (monthly_budget_id) {
+                handleDelete({
+                  monthly_budget_id: monthly_budget_id,
+                  account_id: account_id ?? "",
+                });
+              } else {
+                handleDelete({
+                  transaction_id: transaction_id,
+                  account_id: account_id ?? "",
+                });
+              }
             }}
           >
             Delete

@@ -153,9 +153,12 @@ export const transactionRouter = createTRPCRouter({
           newBalance = BigInt(acc.balance) + BigInt(input.amount);
         } else if (input.transaction_type === "Expense") {
           newBalance = BigInt(acc.balance) - BigInt(input.amount);
-          if (newBalance < 0) {
-            throw new Error("Insufficient balance");
-          }
+        }
+        if (newBalance < 0) {
+          throw new Error("Insufficient balance");
+        }
+        if (Number(newBalance) >= Number.MAX_SAFE_INTEGER) {
+          throw new Error("Balance limit exceeded");
         }
         await ctx.db
           .update(user_account)
@@ -188,6 +191,127 @@ export const transactionRouter = createTRPCRouter({
         throw new Error("An unknown error occurred");
       }
     }),
+
+  updateTransaction: publicProcedure
+    .input(
+      z.object({
+        amount: z.string().nonempty("amount not found"),
+        description: z
+          .string()
+          .max(500, "description must be less than 500 characters"),
+        account_id: z.string(),
+        category_id: z.string().nonempty("category not found"),
+        transaction_type: z.string().nonempty("transaction type not found"),
+        transaction_id: z.string().nonempty("transaction not found"),
+        transaction_date: z
+          .date()
+          .max(new Date(), "date must be today or before"),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        if (
+          input.transaction_type !== "Income" &&
+          input.transaction_type !== "Expense"
+        ) {
+          throw new Error("Transaction type must be either Income or Expense");
+        }
+        if (isNaN(Number(input.amount))) {
+          throw new Error("Amount must be a number");
+        }
+        if (
+          Number(input.amount) <= 0 ||
+          Number(input.amount) >= 1000000000000000
+        ) {
+          throw new Error(
+            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
+          );
+        }
+        if (isNaN(Number(input.category_id))) {
+          throw new Error("Category not found");
+        }
+        const acc = await ctx.db.query.user_account.findFirst({
+          where: (fields, operators) =>
+            operators.and(eq(fields.id, input.account_id)),
+        });
+
+        const transactionFind = await ctx.db.query.transaction.findFirst({
+          where: (fields, operators) =>
+            operators.and(
+              eq(fields.id, input.transaction_id),
+              eq(fields.user_account_id, input.account_id),
+            ),
+        });
+        if (!acc || !transactionFind) {
+          throw new Error("Account or Transaction not found");
+        }
+        const oldAmount = Number(transactionFind.amount);
+        let newBalance = BigInt(0);
+        if (
+          input.transaction_type === "Income" &&
+          transactionFind.transaction_type === "Income"
+        ) {
+          newBalance =
+            BigInt(acc.balance) - BigInt(oldAmount) + BigInt(input.amount);
+        }
+        if (
+          input.transaction_type === "Expense" &&
+          transactionFind.transaction_type === "Expense"
+        ) {
+          newBalance =
+            BigInt(acc.balance) + BigInt(oldAmount) - BigInt(input.amount);
+        }
+        if (
+          input.transaction_type === "Income" &&
+          transactionFind.transaction_type === "Expense"
+        ) {
+          newBalance =
+            BigInt(acc.balance) + BigInt(input.amount) + BigInt(oldAmount);
+        }
+        if (
+          input.transaction_type === "Expense" &&
+          transactionFind.transaction_type === "Income"
+        ) {
+          newBalance =
+            BigInt(acc.balance) - BigInt(input.amount) - BigInt(oldAmount);
+        }
+        if (Number(newBalance) >= Number.MAX_SAFE_INTEGER) {
+          throw new Error("Balance limit exceeded");
+        }
+        if (newBalance < 0) {
+          throw new Error("Insufficient balance");
+        }
+        await ctx.db
+          .update(user_account)
+          .set({
+            balance: newBalance.toString(),
+          })
+          .where(eq(user_account.id, input.account_id))
+          .execute();
+
+        return await ctx.db
+          .update(transaction)
+          .set({
+            amount: input.amount,
+            description: input.description,
+            transaction_date: input.transaction_date.toLocaleDateString(),
+            transaction_type: input.transaction_type,
+            category_id: Number(input.category_id),
+          })
+          .where(eq(transaction.id, input.transaction_id))
+          .execute();
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          toast.error(e.errors?.[0]?.message);
+          throw new Error(e.errors.map((issue) => issue.message).join(", "));
+        }
+        if (e instanceof Error) {
+          throw new Error(e.message);
+        }
+        throw new Error("An unknown error occurred");
+      }
+    }),
+
   deleteTransaction: publicProcedure
     .input(
       z.object({

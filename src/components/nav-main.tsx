@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { CreditCard, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 
 export function NavMain({
   items,
@@ -78,6 +78,14 @@ export function NavMain({
               <SidebarMenuButton>
                 <TrendingDownIcon />
                 <span>Expense</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Link>
+          <Link href={`/user/account-list`} prefetch={true} shallow>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <CreditCard />
+                <span>My Accounts</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </Link>

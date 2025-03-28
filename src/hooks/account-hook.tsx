@@ -121,14 +121,39 @@ export const handleSubmitCreateIncome = (
       toast.success("Income created successfully");
     },
   });
+
+  const { mutate: mutateUpdate } =
+    api.transaction.updateTransaction.useMutation({
+      onMutate: () => {
+        toast.info("Updating income...");
+        setLoading(true);
+      },
+      onError: (error) => {
+        const errorMessages = error.data?.zodError?.fieldErrors
+          ? Object.values(error.data.zodError.fieldErrors).flat()
+          : [error.message];
+        errorMessages.forEach((msg) => toast.error(msg));
+        setLoading(false);
+      },
+      onSuccess: async () => {
+        await utils.transaction.invalidate();
+        await utils.account.invalidate();
+        await utils.budget.invalidate();
+        setOpen(false);
+        setLoading(false);
+        toast.success("Income updated successfully");
+      },
+    });
+
   const createIncome = (
     e: React.FormEvent<HTMLFormElement>,
     selectedDate: Date | null,
     accountId: string,
-    userId: string,
+    userId?: string,
+    isUpdate?: boolean,
+    transaction_id?: string,
   ) => {
     e.preventDefault();
-    setLoading(true);
     const form = new FormData(e.currentTarget);
     const amount = form.get("amount") as string;
     const description = form.get("description") as string;
@@ -137,16 +162,28 @@ export const handleSubmitCreateIncome = (
     const transactionType = form.get("transaction_type") as string;
     const id = uuidv4();
 
-    mutate({
-      id,
-      amount: amount,
-      description,
-      account_id: accountId,
-      category_id: category_id,
-      date: date,
-      transaction_type: transactionType,
-      user_id: userId,
-    });
+    if (isUpdate && transaction_id) {
+      mutateUpdate({
+        transaction_id: transaction_id,
+        amount: amount,
+        description,
+        account_id: accountId,
+        category_id: category_id,
+        transaction_type: transactionType,
+        transaction_date: date,
+      });
+    } else if (userId) {
+      mutate({
+        id,
+        amount: amount,
+        description,
+        account_id: accountId,
+        category_id: category_id,
+        date: date,
+        transaction_type: transactionType,
+        user_id: userId,
+      });
+    }
   };
   return { createIncome };
 };
@@ -171,8 +208,38 @@ export const deleteTransaction = (setLoading: (loading: boolean) => void) => {
     },
   });
 
-  const handleDelete = (transaction_id: string, account_id: string) => {
-    mutate({ transaction_id, account_id });
+  const { mutate: mutateDelete } = api.budget.deleteBudget.useMutation({
+    onMutate: () => {
+      setLoading(true);
+      toast.info("Deleting budget...");
+    },
+    onError: (error) => {
+      setLoading(false);
+      toast.error(error.message);
+    },
+    onSuccess: async () => {
+      await utils.transaction.invalidate();
+      await utils.account.invalidate();
+      await utils.budget.invalidate();
+      toast.success("Budget deleted successfully");
+      setLoading(false);
+    },
+  });
+
+  const handleDelete = ({
+    transaction_id,
+    account_id,
+    monthly_budget_id,
+  }: {
+    transaction_id?: string;
+    account_id: string;
+    monthly_budget_id?: string;
+  }) => {
+    if (transaction_id) {
+      mutate({ transaction_id, account_id });
+    } else if (monthly_budget_id) {
+      mutateDelete({ id: monthly_budget_id });
+    }
   };
 
   return { handleDelete };
