@@ -102,7 +102,7 @@ export const handleSubmitCreateIncome = (
   const utils = api.useUtils();
   const { mutate } = api.transaction.createIncome.useMutation({
     onMutate: () => {
-      toast.info("Creating income...");
+      toast.info("Creating transaction...");
       setLoading(true);
     },
     onError: (error) => {
@@ -118,14 +118,14 @@ export const handleSubmitCreateIncome = (
       await utils.budget.invalidate();
       setOpen(false);
       setLoading(false);
-      toast.success("Income created successfully");
+      toast.success("Transaction created successfully");
     },
   });
 
   const { mutate: mutateUpdate } =
     api.transaction.updateTransaction.useMutation({
       onMutate: () => {
-        toast.info("Updating income...");
+        toast.info("Updating transaction...");
         setLoading(true);
       },
       onError: (error) => {
@@ -141,7 +141,7 @@ export const handleSubmitCreateIncome = (
         await utils.budget.invalidate();
         setOpen(false);
         setLoading(false);
-        toast.success("Income updated successfully");
+        toast.success("Transaction updated successfully");
       },
     });
 
