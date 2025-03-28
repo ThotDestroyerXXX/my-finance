@@ -60,6 +60,7 @@ export default function Expense({
             <AddTransaction
               user_id={session.data.user.id}
               account_id={param.id}
+              setLoading={setLoading}
             />
           </div>
         ) : (
