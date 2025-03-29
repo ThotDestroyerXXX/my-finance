@@ -432,4 +432,64 @@ export const transactionRouter = createTRPCRouter({
       }
       return income[0]?.totalIncome ?? 0;
     }),
+
+  getOverallIncome: publicProcedure
+    .input(
+      z.object({
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const income = await ctx.db
+        .select({
+          totalIncome: sum(transaction.amount),
+          transaction_date: transaction.transaction_date,
+        })
+        .from(transaction)
+        .groupBy(
+          transaction.transaction_date,
+          transaction.transaction_type,
+          transaction.user_account_id,
+        )
+
+        .where(
+          and(
+            eq(transaction.transaction_type, "Income"),
+            eq(transaction.user_account_id, input.account_id),
+          ),
+        )
+
+        .execute();
+      if (!income) {
+        return null;
+      }
+      return income;
+    }),
+
+  getOverallExpense: publicProcedure
+    .input(z.object({ account_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const expense = await ctx.db
+        .select({
+          totalExpense: sum(transaction.amount),
+          transaction_date: transaction.transaction_date,
+        })
+        .from(transaction)
+        .groupBy(
+          transaction.transaction_date,
+          transaction.transaction_type,
+          transaction.user_account_id,
+        )
+        .where(
+          and(
+            eq(transaction.transaction_type, "Expense"),
+            eq(transaction.user_account_id, input.account_id),
+          ),
+        )
+        .execute();
+      if (!expense) {
+        return null;
+      }
+      return expense;
+    }),
 });

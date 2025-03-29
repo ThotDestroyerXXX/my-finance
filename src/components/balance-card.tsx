@@ -31,7 +31,7 @@ const BalanceCard = ({
       {isPending || !isFetched ? (
         <Skeleton className="block h-[13rem] w-full" />
       ) : (
-        <Card className="@container/card flex h-full w-full flex-col justify-center gap-5 py-4 text-justify">
+        <Card className="@container/card flex h-full w-full flex-col justify-center gap-5 py-6 text-justify">
           <CardHeader>
             <CardDescription className="text-foreground text-sm @md/card:text-base">
               {account?.name}

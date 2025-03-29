@@ -60,7 +60,7 @@ export default function Expense({
     return (
       <>
         {loading && <Spinner />}
-        {(!expenses || expenses.length <= 0 || !monthlyExpense) &&
+        {(!expenses || expenses.length <= 0) &&
         isFetched &&
         param?.id &&
         session.data?.user.id ? (
@@ -81,6 +81,7 @@ export default function Expense({
               placeholder="expense"
               transactionAmount={monthlyExpense}
             />
+
             <TransactionTable
               transactions={expenses}
               isFetched={isFetched}

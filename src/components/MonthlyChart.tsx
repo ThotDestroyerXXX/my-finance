@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { currency } from "@/lib/utils";
+import { getMonth } from "date-fns";
 
 export default function MonthlyChart({
   transactions,
@@ -29,10 +30,17 @@ export default function MonthlyChart({
         const category = transaction.category.name;
         const existingCategory = acc.find((item) => item.category === category);
 
-        if (existingCategory) {
+        if (
+          existingCategory &&
+          getMonth(transaction.transaction.transaction_date) ===
+            getMonth(new Date())
+        ) {
           // If the category already exists, aggregate the amount
           existingCategory.amount += Number(transaction.transaction.amount);
-        } else {
+        } else if (
+          getMonth(transaction.transaction.transaction_date) ===
+          getMonth(new Date())
+        ) {
           // If the category doesn't exist, add a new entry
           acc.push({
             category,

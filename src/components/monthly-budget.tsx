@@ -52,7 +52,7 @@ export default function MonthlyBudget({
       {isPending || !isFetched ? (
         <Spinner />
       ) : (
-        <Card className="@container/card flex h-full w-full flex-col justify-center gap-5 py-4 text-justify">
+        <Card className="@container/card flex h-full w-full flex-col justify-center gap-5 py-6 text-justify">
           <CardHeader>
             {monthlyBudget ? (
               <>
