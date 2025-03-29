@@ -401,4 +401,35 @@ export const transactionRouter = createTRPCRouter({
       }
       return expense[0]?.totalExpense ?? 0;
     }),
+
+  getMonthlyIncome: publicProcedure
+    .input(
+      z.object({
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const income = await ctx.db
+        .select({ totalIncome: sum(transaction.amount) })
+        .from(transaction)
+        .where(
+          and(
+            eq(transaction.transaction_type, "Income"),
+            eq(transaction.user_account_id, input.account_id),
+            eq(
+              sql<number>`EXTRACT(MONTH FROM ${transaction.transaction_date})`,
+              new Date().getMonth() + 1,
+            ),
+            eq(
+              sql<number>`EXTRACT(YEAR FROM ${transaction.transaction_date})`,
+              new Date().getFullYear(),
+            ),
+          ),
+        )
+        .execute();
+      if (!income) {
+        return 0;
+      }
+      return income[0]?.totalIncome ?? 0;
+    }),
 });

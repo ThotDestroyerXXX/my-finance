@@ -39,13 +39,36 @@ export const useCreateAccount = (
     },
   });
 
+  const { mutate: mutateUpdate } = api.account.updateAccount.useMutation({
+    onError: (error) => {
+      const errorMessages = error.data?.zodError?.fieldErrors
+        ? Object.values(error.data.zodError.fieldErrors).flat()
+        : [error.message];
+      errorMessages.forEach((msg) => toast.error(msg));
+      setLoading(false);
+    },
+    onMutate: () => {
+      toast.info("Updating account...");
+      setLoading(true);
+    },
+    onSuccess: async () => {
+      await utils.account.getAccountList.invalidate();
+      setOpen(false);
+      setLoading(false);
+      toast.success("Account updated successfully");
+    },
+  });
+
   const createAccount = (
     e: React.FormEvent<HTMLFormElement>,
     user_id: string | undefined,
     selectedAccountType: string | null,
     selectedCurrencyType: string | null,
+    isUpdate?: boolean,
+    account_id?: string,
   ) => {
     e.preventDefault();
+    console.log("tes");
     setLoading(true);
     if (!user_id) {
       redirect("/auth/login");
@@ -65,14 +88,24 @@ export const useCreateAccount = (
 
     const id = uuidv4();
 
-    mutate({
-      id: id,
-      user_id,
-      name,
-      balance: balance,
-      user_account_type_id: Number(selectedAccountType ?? "-1"),
-      currency_type: symbol,
-    });
+    if (isUpdate) {
+      mutateUpdate({
+        id: account_id ?? "",
+        name,
+        balance: balance,
+        user_account_type_id: Number(selectedAccountType ?? "-1"),
+        currency_type: symbol,
+      });
+    } else {
+      mutate({
+        id: id,
+        user_id,
+        name,
+        balance: balance,
+        user_account_type_id: Number(selectedAccountType ?? "-1"),
+        currency_type: symbol,
+      });
+    }
   };
 
   return createAccount;
@@ -240,6 +273,33 @@ export const deleteTransaction = (setLoading: (loading: boolean) => void) => {
     } else if (monthly_budget_id) {
       mutateDelete({ id: monthly_budget_id });
     }
+  };
+
+  return { handleDelete };
+};
+
+export const handleDeleteAccount = (setLoading: (loading: boolean) => void) => {
+  const utils = api.useUtils();
+  const { mutate } = api.account.deleteAccount.useMutation({
+    onMutate: () => {
+      setLoading(true);
+      toast.info("Deleting account...");
+    },
+    onError: (error) => {
+      setLoading(false);
+      toast.error(error.message);
+    },
+    onSuccess: async () => {
+      await utils.transaction.invalidate();
+      await utils.account.invalidate();
+      await utils.budget.invalidate();
+      toast.success("Account deleted successfully");
+      setLoading(false);
+    },
+  });
+
+  const handleDelete = (account_id: string) => {
+    mutate({ account_id });
   };
 
   return { handleDelete };

@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { user_account, user_account_type } from "@/server/db/schema";
+import {
+  monthly_budget,
+  transaction,
+  user_account,
+  user_account_type,
+} from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 
@@ -95,6 +100,74 @@ export const accountRouter = createTRPCRouter({
           throw new Error(e.message);
         }
         throw new Error("An unknown error occurred");
+      }
+    }),
+
+  updateAccount: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        balance: z.string(),
+        currency_type: z.string(),
+        user_account_type_id: z.number(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        if (isNaN(Number(input.balance))) {
+          throw new Error("Balance must be a number!");
+        }
+        if (Number(input.balance) < 0) {
+          throw new Error("Balance must be greater than 0!");
+        }
+        if (Number(input.balance) >= 1000000000000000) {
+          throw new Error("Balance must be less than 1.000.000.000.000.000");
+        }
+        return ctx.db
+          .update(user_account)
+          .set({
+            name: input.name,
+            balance: input.balance,
+            currency_type: input.currency_type,
+            user_account_type_id: input.user_account_type_id,
+          })
+          .where(eq(user_account.id, input.id))
+          .execute();
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          toast.error(e.errors?.[0]?.message);
+          throw new Error(e.errors.map((issue) => issue.message).join(", "));
+        }
+        if (e instanceof Error) {
+          throw new Error(e.message);
+        }
+        throw new Error("An unknown error occurred");
+      }
+    }),
+
+  deleteAccount: publicProcedure
+    .input(
+      z.object({
+        account_id: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        await ctx.db
+          .delete(monthly_budget)
+          .where(eq(monthly_budget.user_account_id, input.account_id))
+          .execute();
+        await ctx.db
+          .delete(transaction)
+          .where(eq(transaction.user_account_id, input.account_id))
+          .execute();
+        return await ctx.db
+          .delete(user_account)
+          .where(eq(user_account.id, input.account_id))
+          .execute();
+      } catch {
+        throw new Error("Failed to delete account");
       }
     }),
 });

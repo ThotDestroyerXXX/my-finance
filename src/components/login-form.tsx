@@ -74,7 +74,7 @@ export function LoginForm({
                     />
                   </div>
                   <div className="flex flex-row gap-2">
-                    <input
+                    <Input
                       id="rememberMe"
                       name="rememberMe"
                       type="checkbox"

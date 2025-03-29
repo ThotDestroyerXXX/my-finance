@@ -1,5 +1,6 @@
 "use client";
 import AddTransaction from "@/components/add-transaction";
+import MonthlyChart from "@/components/MonthlyChart";
 import TransactionTable from "@/components/transaction-table";
 import Spinner from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
@@ -41,6 +42,14 @@ export default function Expense({
       enabled: !!param?.id && !!session.data?.user.id,
     },
   );
+  const { data: monthlyExpense } = api.transaction.getMonthlyExpense.useQuery(
+    {
+      account_id: param?.id ?? "",
+    },
+    {
+      enabled: !!param?.id,
+    },
+  );
   if (
     (!param?.id || !session.data?.user.id || !expenses) &&
     !isPending &&
@@ -51,7 +60,7 @@ export default function Expense({
     return (
       <>
         {loading && <Spinner />}
-        {(!expenses || expenses.length <= 0) &&
+        {(!expenses || expenses.length <= 0 || !monthlyExpense) &&
         isFetched &&
         param?.id &&
         session.data?.user.id ? (
@@ -65,6 +74,13 @@ export default function Expense({
           </div>
         ) : (
           <div className="flex h-full w-full flex-col gap-6 p-6">
+            <MonthlyChart
+              transactions={expenses}
+              isPending={isPending}
+              isFetched={isFetched}
+              placeholder="expense"
+              transactionAmount={monthlyExpense}
+            />
             <TransactionTable
               transactions={expenses}
               isFetched={isFetched}

@@ -18,6 +18,21 @@ export type transactionProps = typeof transaction.$inferSelect;
 
 export type MonthlyBudgetProps = typeof monthly_budget.$inferSelect;
 
+export type MonthlyChart = {
+  transactions:
+    | {
+        user_account: accountProps;
+        category: categoryProps;
+        transaction: transactionProps;
+      }[]
+    | undefined
+    | null;
+  isFetched: boolean;
+  isPending: boolean;
+  transactionAmount: string | 0 | undefined;
+  placeholder: string;
+};
+
 export type TransactionProps = {
   transactions:
     | {
@@ -38,4 +53,5 @@ export interface ComboboxProps {
   values: string[] | undefined;
   label?: string[];
   onSelect: (value: string) => void;
+  defaultValue?: string;
 }

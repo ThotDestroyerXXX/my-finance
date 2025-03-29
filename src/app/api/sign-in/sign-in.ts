@@ -19,7 +19,7 @@ export default function useSignIn() {
       {
         email,
         password,
-        rememberMe: rememberMe === "true",
+        rememberMe: rememberMe === "on",
       },
       {
         onRequest: () => {

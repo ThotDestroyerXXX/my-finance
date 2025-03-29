@@ -5,7 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
 import { api } from "@/trpc/react";
-import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -18,13 +17,13 @@ export default function AccountList() {
   } = api.account.getAccountList.useQuery({
     user_id: session?.data?.user.id ?? "",
   });
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [loading, setLoading] = useState(false);
   if (error) {
     toast.error(error.message);
   }
   return (
     <div className="flex flex-row flex-wrap justify-center gap-5 py-5">
-      {isNavigating && <Spinner />}
+      {loading && <Spinner />}
       {isPending ? (
         <>
           <Skeleton className="h-[10rem] w-[20rem]" />
@@ -37,15 +36,11 @@ export default function AccountList() {
           {!error && <CreateAccount user_id={session?.data?.user.id} />}
 
           {accounts?.map((account) => (
-            <Link
+            <AccountCard
               key={account.id}
-              href={`/user/dashboard/${account.id}`}
-              onClick={() => setIsNavigating(true)}
-              prefetch
-              shallow
-            >
-              <AccountCard key={account.id} {...account} />
-            </Link>
+              setLoading={setLoading}
+              account={account}
+            />
           ))}
         </>
       )}
