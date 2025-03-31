@@ -1,3 +1,4 @@
+import { handleDeleteCategoryBudget } from "@/hooks/budget-hook";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,20 +9,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { handleDeleteAccount } from "@/hooks/account-hook";
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+} from "./ui/alert-dialog";
+import { DropdownMenuItem } from "./ui/dropdown-menu";
 
-export function AlertDeleteAccount({
-  account_id,
+export default function AlertDeleteCategoryBudget({
   setLoading,
-  icon,
+  category_budget_id,
 }: Readonly<{
-  account_id: string | undefined;
   setLoading: (loading: boolean) => void;
-  icon?: React.ReactNode;
+  category_budget_id: string | undefined;
 }>) {
-  const { handleDelete } = handleDeleteAccount(setLoading);
+  const { deleteCategoryBudget } = handleDeleteCategoryBudget(setLoading);
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -32,7 +31,6 @@ export function AlertDeleteAccount({
             e.preventDefault();
           }}
         >
-          {icon}
           delete
         </DropdownMenuItem>
       </AlertDialogTrigger>
@@ -49,7 +47,7 @@ export function AlertDeleteAccount({
           <AlertDialogAction
             className="bg-red-600 text-white hover:bg-red-700"
             onClick={() => {
-              handleDelete(account_id ?? "");
+              deleteCategoryBudget(category_budget_id ?? "");
             }}
           >
             Delete

@@ -14,6 +14,18 @@ export const fetchAllAccountTypes = () => {
   return { accountTypes, isPending, isError };
 };
 
+export const fetchAllAccountByUserId = (user_id: string) => {
+  const {
+    data: accounts,
+    isPending,
+    isFetched,
+    error,
+  } = api.account.getAccountList.useQuery({
+    user_id: user_id ?? "",
+  });
+  return { accounts, isPending, isFetched, error };
+};
+
 export const useCreateAccount = (
   setLoading: (loading: boolean) => void,
   setOpen: (open: boolean) => void,

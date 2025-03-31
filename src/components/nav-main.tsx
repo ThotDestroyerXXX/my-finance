@@ -2,6 +2,7 @@
 
 import {
   IconDashboard,
+  IconFolderDollar,
   IconMail,
   IconMoneybagEdit,
   type Icon,
@@ -14,6 +15,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { CreditCard, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
@@ -29,11 +31,15 @@ export function NavMain({
   }[];
   account_id: string;
 }>) {
+  const { setOpenMobile } = useSidebar();
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
+          <SidebarMenuItem
+            className="flex items-center gap-2"
+            onClick={() => setOpenMobile(false)}
+          >
             <Button>
               <IconMoneybagEdit />
               Review Money
@@ -49,7 +55,12 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          <Link href={`/user/dashboard/${account_id}`} prefetch={true} shallow>
+          <Link
+            href={`/user/dashboard/${account_id}`}
+            prefetch={true}
+            shallow
+            onClick={() => setOpenMobile(false)}
+          >
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <IconDashboard />
@@ -61,6 +72,7 @@ export function NavMain({
             href={`/user/dashboard/${account_id}/income`}
             prefetch={true}
             shallow
+            onClick={() => setOpenMobile(false)}
           >
             <SidebarMenuItem>
               <SidebarMenuButton>
@@ -73,6 +85,7 @@ export function NavMain({
             href={`/user/dashboard/${account_id}/expense`}
             prefetch={true}
             shallow
+            onClick={() => setOpenMobile(false)}
           >
             <SidebarMenuItem>
               <SidebarMenuButton>
@@ -81,7 +94,25 @@ export function NavMain({
               </SidebarMenuButton>
             </SidebarMenuItem>
           </Link>
-          <Link href={`/user/account-list`} prefetch={true} shallow>
+          <Link
+            href={`/user/dashboard/${account_id}/budget`}
+            prefetch={true}
+            shallow
+            onClick={() => setOpenMobile(false)}
+          >
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <IconFolderDollar />
+                <span>Budget</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Link>
+          <Link
+            href={`/user/account-list`}
+            prefetch={true}
+            shallow
+            onClick={() => setOpenMobile(false)}
+          >
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <CreditCard />

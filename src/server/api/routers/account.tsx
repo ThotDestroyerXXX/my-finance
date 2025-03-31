@@ -8,6 +8,7 @@ import {
 } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { toast } from "sonner";
+import { maxNum } from "@/lib/interface";
 
 export const accountRouter = createTRPCRouter({
   getAccountList: publicProcedure
@@ -77,7 +78,7 @@ export const accountRouter = createTRPCRouter({
         if (Number(input.balance) < 0) {
           throw new Error("Balance must be greater than 0!");
         }
-        if (Number(input.balance) >= 1000000000000000) {
+        if (Number(input.balance) >= maxNum) {
           throw new Error("Balance must be less than 1.000.000.000.000.000");
         }
         return ctx.db
@@ -121,7 +122,7 @@ export const accountRouter = createTRPCRouter({
         if (Number(input.balance) < 0) {
           throw new Error("Balance must be greater than 0!");
         }
-        if (Number(input.balance) >= 1000000000000000) {
+        if (Number(input.balance) >= maxNum) {
           throw new Error("Balance must be less than 1.000.000.000.000.000");
         }
         return ctx.db

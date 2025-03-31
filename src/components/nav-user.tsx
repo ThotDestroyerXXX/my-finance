@@ -34,6 +34,7 @@ export function NavUser({ session }: Readonly<{ session: Session | null }>) {
   const { isMobile } = useSidebar();
   const { signOut } = useSignOut();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { setOpenMobile } = useSidebar();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -99,7 +100,7 @@ export function NavUser({ session }: Readonly<{ session: Session | null }>) {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Button
-                  onClick={() => signOut({ setIsLoading })}
+                  onClick={() => signOut({ setIsLoading, setOpenMobile })}
                   disabled={isLoading}
                 >
                   <IconLogout />

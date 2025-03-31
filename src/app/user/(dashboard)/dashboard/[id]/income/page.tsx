@@ -3,8 +3,11 @@ import AddTransaction from "@/components/add-transaction";
 import MonthlyChart from "@/components/MonthlyChart";
 import TransactionTable from "@/components/transaction-table";
 import Spinner from "@/components/ui/spinner";
+import {
+  fetchAccountIncomeByUserId,
+  fetchMonthlyIncomeByAccountId,
+} from "@/hooks/transaction-hook";
 import { authClient } from "@/lib/auth-client";
-import { api } from "@/trpc/react";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -29,28 +32,12 @@ export default function Income({
   }, [params]);
 
   const session = authClient.useSession();
-  const {
-    data: incomes,
-    isPending,
-    isFetched,
-  } = api.transaction.getAccountIncomeByUserId.useQuery(
-    {
-      user_id: session.data?.user.id ?? "",
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id && !!session.data?.user.id,
-    },
+  const { incomes, isPending, isFetched } = fetchAccountIncomeByUserId(
+    session.data?.user.id ?? "",
+    param?.id ?? "",
   );
 
-  const { data: monthlyIncome } = api.transaction.getMonthlyIncome.useQuery(
-    {
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id,
-    },
-  );
+  const { monthlyIncome } = fetchMonthlyIncomeByAccountId(param?.id ?? "");
 
   if (
     (!param?.id || !session.data?.user.id || !incomes) &&

@@ -3,8 +3,11 @@ import AddTransaction from "@/components/add-transaction";
 import MonthlyChart from "@/components/MonthlyChart";
 import TransactionTable from "@/components/transaction-table";
 import Spinner from "@/components/ui/spinner";
+import {
+  fetchAccountExpenseByUserId,
+  fetchMonthlyExpenseByAccountId,
+} from "@/hooks/transaction-hook";
 import { authClient } from "@/lib/auth-client";
-import { api } from "@/trpc/react";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -29,27 +32,11 @@ export default function Expense({
   }, [params]);
 
   const session = authClient.useSession();
-  const {
-    data: expenses,
-    isPending,
-    isFetched,
-  } = api.transaction.getAccountExpenseByUserId.useQuery(
-    {
-      user_id: session.data?.user.id ?? "",
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id && !!session.data?.user.id,
-    },
+  const { expenses, isPending, isFetched } = fetchAccountExpenseByUserId(
+    session.data?.user.id ?? "",
+    param?.id ?? "",
   );
-  const { data: monthlyExpense } = api.transaction.getMonthlyExpense.useQuery(
-    {
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id,
-    },
-  );
+  const { monthlyExpense } = fetchMonthlyExpenseByAccountId(param?.id ?? "");
   if (
     (!param?.id || !session.data?.user.id || !expenses) &&
     !isPending &&

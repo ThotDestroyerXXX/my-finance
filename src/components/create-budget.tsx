@@ -51,11 +51,15 @@ export default function CreateBudget({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form
-          onSubmit={(e) =>
-            !isUpdate
-              ? createBudget(e, account_id ?? "")
-              : createBudget(e, account_id ?? "", isUpdate, budget_id)
-          }
+          onSubmit={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (!isUpdate) {
+              createBudget(e, account_id ?? "");
+            } else {
+              createBudget(e, account_id ?? "", isUpdate, budget_id);
+            }
+          }}
         >
           <DialogHeader>
             <DialogTitle>{placeholder ?? "Make"} Monthly Budget</DialogTitle>
@@ -81,7 +85,9 @@ export default function CreateBudget({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={(e) => e.stopPropagation()}>
+              Save changes
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

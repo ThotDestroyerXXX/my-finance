@@ -6,7 +6,6 @@ import dashboardMobile from "@/../public/dashboard_mobile.jpg";
 
 export default function ImageTransitionSection() {
   const { scrollYProgress } = useScroll({ offset: ["start 0.5", "0.9 end"] });
-  console.log(scrollYProgress);
   return (
     <section className="min-h-[80vh] items-center px-10">
       <motion.div style={{ scale: scrollYProgress, originY: 0 }}>

@@ -9,24 +9,26 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { handleDeleteAccount } from "@/hooks/account-hook";
+import { handleDeleteCategory } from "@/hooks/category-hook";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
-export function AlertDeleteAccount({
-  account_id,
+export function AlertDeleteCategory({
+  category_id,
+  user_id,
   setLoading,
   icon,
 }: Readonly<{
-  account_id: string | undefined;
+  category_id: string | undefined;
+  user_id: string | undefined;
   setLoading: (loading: boolean) => void;
   icon?: React.ReactNode;
 }>) {
-  const { handleDelete } = handleDeleteAccount(setLoading);
+  const { handleDelete } = handleDeleteCategory(setLoading);
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <DropdownMenuItem
-          className="flex cursor-pointer flex-row items-center gap-2 rounded-sm p-1 text-red-500 hover:bg-red-500 hover:text-white"
+          className="flex cursor-pointer flex-row items-center gap-2 rounded-sm border-none px-2 py-1 text-red-500 hover:bg-red-500 hover:text-white"
           onSelect={(e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -40,8 +42,8 @@ export function AlertDeleteAccount({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            This action cannot be undone. This will permanently delete the
+            category and transactions related to the category.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -49,7 +51,7 @@ export function AlertDeleteAccount({
           <AlertDialogAction
             className="bg-red-600 text-white hover:bg-red-700"
             onClick={() => {
-              handleDelete(account_id ?? "");
+              handleDelete(category_id ?? "", user_id ?? "");
             }}
           >
             Delete

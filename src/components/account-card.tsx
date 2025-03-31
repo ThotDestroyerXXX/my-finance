@@ -8,18 +8,12 @@ import {
   CardAction,
 } from "./ui/card";
 import { currency } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { EllipsisVertical } from "lucide-react";
 import { AlertDeleteAccount } from "./alert-delete-account";
 import { CreateAccount } from "./create-account";
 import Link from "next/link";
 import { getISOByParam } from "iso-country-currency";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
+import DropdownDeleteEdit from "./dropdown-delete-edit";
 
 const AccountCard = ({
   setLoading,
@@ -51,49 +45,28 @@ const AccountCard = ({
               e.preventDefault();
             }}
           >
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <EllipsisVertical
-                  className="h-4 w-4 cursor-pointer"
-                  onSelect={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }}
+            <DropdownDeleteEdit
+              editContent={
+                <CreateAccount
+                  account_balance={account.balance}
+                  account_id={account.id}
+                  account_name={account.name}
+                  currency_type={getISOByParam("symbol", account.currency_type)}
+                  isUpdate={true}
+                  user_account_type_id={account.user_account_type_id.toString()}
+                  user_id={account.user_id}
+                  icon={<IconEdit className="h-4 w-4" />}
+                  setLoading={setLoading}
                 />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                onSelect={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                }}
-              >
-                <DropdownMenuGroup
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }}
-                >
-                  <CreateAccount
-                    account_balance={account.balance}
-                    account_id={account.id}
-                    account_name={account.name}
-                    currency_type={getISOByParam(
-                      "symbol",
-                      account.currency_type,
-                    )}
-                    isUpdate={true}
-                    user_account_type_id={account.user_account_type_id.toString()}
-                    user_id={account.user_id}
-                    icon={<IconEdit className="h-4 w-4" />}
-                  />
-                  <AlertDeleteAccount
-                    account_id={account.id}
-                    setLoading={setLoading}
-                    icon={<IconTrash className="h-4 w-4" />}
-                  />
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              }
+              deleteContent={
+                <AlertDeleteAccount
+                  account_id={account.id}
+                  setLoading={setLoading}
+                  icon={<IconTrash className="h-4 w-4" />}
+                />
+              }
+            />
           </CardAction>
         </CardHeader>
       </Card>

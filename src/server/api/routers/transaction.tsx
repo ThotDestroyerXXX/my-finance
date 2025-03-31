@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { transaction, user_account, category } from "@/server/db/schema";
 import { eq, desc, sum, and, sql } from "drizzle-orm";
 import { toast } from "sonner";
+import { maxNum } from "@/lib/interface";
 
 export const transactionRouter = createTRPCRouter({
   getAccountIncomeByUserId: publicProcedure
@@ -127,10 +128,7 @@ export const transactionRouter = createTRPCRouter({
         if (isNaN(Number(input.amount))) {
           throw new Error("Amount must be a number");
         }
-        if (
-          Number(input.amount) <= 0 ||
-          Number(input.amount) >= 1000000000000000
-        ) {
+        if (Number(input.amount) <= 0 || Number(input.amount) >= maxNum) {
           throw new Error(
             "Amount must be greater than 0 and less than 1.000.000.000.000.000",
           );
@@ -148,18 +146,19 @@ export const transactionRouter = createTRPCRouter({
         if (!acc) {
           throw new Error("Account not found");
         }
-        let newBalance = BigInt(0);
+        let newBalance = Number(0);
         if (input.transaction_type === "Income") {
-          newBalance = BigInt(acc.balance) + BigInt(input.amount);
+          newBalance = Number(acc.balance) + Number(input.amount); // Keep as a string
         } else if (input.transaction_type === "Expense") {
-          newBalance = BigInt(acc.balance) - BigInt(input.amount);
+          newBalance = Number(acc.balance) - Number(input.amount); // Keep as a string
         }
         if (newBalance < 0) {
           throw new Error("Insufficient balance");
         }
-        if (Number(newBalance) >= Number.MAX_SAFE_INTEGER) {
+        if (Number(newBalance) >= maxNum) {
           throw new Error("Balance limit exceeded");
         }
+
         await ctx.db
           .update(user_account)
           .set({
@@ -219,10 +218,7 @@ export const transactionRouter = createTRPCRouter({
         if (isNaN(Number(input.amount))) {
           throw new Error("Amount must be a number");
         }
-        if (
-          Number(input.amount) <= 0 ||
-          Number(input.amount) >= 1000000000000000
-        ) {
+        if (Number(input.amount) <= 0 || Number(input.amount) >= maxNum) {
           throw new Error(
             "Amount must be greater than 0 and less than 1.000.000.000.000.000",
           );
@@ -246,36 +242,36 @@ export const transactionRouter = createTRPCRouter({
           throw new Error("Account or Transaction not found");
         }
         const oldAmount = Number(transactionFind.amount);
-        let newBalance = BigInt(0);
+        let newBalance = 0;
         if (
           input.transaction_type === "Income" &&
           transactionFind.transaction_type === "Income"
         ) {
           newBalance =
-            BigInt(acc.balance) - BigInt(oldAmount) + BigInt(input.amount);
+            Number(acc.balance) - Number(oldAmount) + Number(input.amount);
         }
         if (
           input.transaction_type === "Expense" &&
           transactionFind.transaction_type === "Expense"
         ) {
           newBalance =
-            BigInt(acc.balance) + BigInt(oldAmount) - BigInt(input.amount);
+            Number(acc.balance) + Number(oldAmount) - Number(input.amount);
         }
         if (
           input.transaction_type === "Income" &&
           transactionFind.transaction_type === "Expense"
         ) {
           newBalance =
-            BigInt(acc.balance) + BigInt(input.amount) + BigInt(oldAmount);
+            Number(acc.balance) + Number(input.amount) + Number(oldAmount);
         }
         if (
           input.transaction_type === "Expense" &&
           transactionFind.transaction_type === "Income"
         ) {
           newBalance =
-            BigInt(acc.balance) - BigInt(input.amount) - BigInt(oldAmount);
+            Number(acc.balance) - Number(input.amount) - Number(oldAmount);
         }
-        if (Number(newBalance) >= Number.MAX_SAFE_INTEGER) {
+        if (Number(newBalance) >= maxNum) {
           throw new Error("Balance limit exceeded");
         }
         if (newBalance < 0) {

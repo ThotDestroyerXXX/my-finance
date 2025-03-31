@@ -29,6 +29,9 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { handleSubmitCreateIncome } from "@/hooks/account-hook";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
+import AddCategory from "./add-category";
+import DropdownDeleteEdit from "./dropdown-delete-edit";
+import { AlertDeleteCategory } from "./alert-delete-category";
 
 interface TransactionProps {
   user_id?: string;
@@ -59,11 +62,15 @@ export default function AddTransaction({
 }: Readonly<TransactionProps>) {
   const { categoryTypes, isPending, isFetched, isError } =
     fetchCategoryTypeByUserId(user_id ?? "");
+
   const [date, setDate] = useState<Date | null>(
     transaction_date ? new Date(transaction_date) : null,
   );
+
   const [open, setOpen] = useState<boolean>(false);
+
   const { createIncome } = handleSubmitCreateIncome(setLoading, setOpen);
+
   if (isError) {
     toast.error("Error fetching category types");
   }
@@ -125,6 +132,8 @@ export default function AddTransaction({
           </DialogHeader>
           <form
             onSubmit={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
               if (isUpdate) {
                 createIncome(
                   e,
@@ -163,14 +172,42 @@ export default function AddTransaction({
                     <SelectValue placeholder="Transaction Type" />
                   </SelectTrigger>
                   <SelectContent>
+                    <AddCategory user_id={user_id} setLoading={setLoading} />
                     {categoryTypes?.map((category) => (
-                      <SelectItem
+                      <div
                         key={category.id}
-                        value={category.id.toString()}
+                        className="hover:bg-accent hover:text-accent-foreground flex w-full cursor-pointer flex-row items-center justify-between rounded-sm px-2 py-1"
                       >
-                        {category.icon_image}
-                        {category.name}
-                      </SelectItem>
+                        <SelectItem
+                          value={category.id.toString()}
+                          className="cursor-pointer"
+                        >
+                          {category.icon_image}
+                          {category.name}
+                        </SelectItem>
+                        {category.user_id && (
+                          <DropdownDeleteEdit
+                            editContent={
+                              <AddCategory
+                                setLoading={setLoading}
+                                user_id={user_id}
+                                category_id={category.id.toString()}
+                                category_name={category.name}
+                                icon={category.icon_image}
+                                isUpdate={true}
+                                placeholder="Update"
+                              />
+                            }
+                            deleteContent={
+                              <AlertDeleteCategory
+                                category_id={category.id.toString()}
+                                setLoading={setLoading}
+                                user_id={user_id}
+                              />
+                            }
+                          />
+                        )}
+                      </div>
                     ))}
                   </SelectContent>
                 </Select>
@@ -219,7 +256,9 @@ export default function AddTransaction({
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" onClick={(e) => e.stopPropagation()}>
+                Save changes
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

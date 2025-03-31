@@ -28,6 +28,7 @@ export function CreateAccount({
   account_id,
   isUpdate,
   icon,
+  setLoading,
 }: Readonly<{
   user_id?: string;
   account_name?: string;
@@ -37,6 +38,7 @@ export function CreateAccount({
   account_id?: string;
   isUpdate?: boolean;
   icon?: React.ReactNode;
+  setLoading: (loading: boolean) => void;
 }>) {
   const currencyCodes = getAllISOCodes();
   const currencySymbol = currencyCodes.map((currency) => currency.symbol);
@@ -52,7 +54,6 @@ export function CreateAccount({
   const [selectedCurrencyType, setSelectedCurrencyType] = useState<
     string | null
   >(currency_type ?? null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const createAccount = useCreateAccount(setLoading, setOpen);
   return (
@@ -61,8 +62,6 @@ export function CreateAccount({
         {isUpdate ? (
           <DropdownMenuItem
             onSelect={(e) => {
-              e.stopPropagation();
-              e.stopPropagation();
               e.stopPropagation();
               e.preventDefault();
             }}
@@ -178,7 +177,6 @@ export function CreateAccount({
             <DialogFooter hidden={accountTypes.isPending}>
               <Button
                 type="submit"
-                disabled={loading}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}

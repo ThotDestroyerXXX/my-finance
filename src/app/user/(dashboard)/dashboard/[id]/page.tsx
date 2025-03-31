@@ -7,10 +7,16 @@ import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { api } from "@/trpc/react";
 import Spinner from "@/components/ui/spinner";
 import MonthlyBudget from "@/components/monthly-budget";
 import TransactionChart from "@/components/TransactionChart";
+import { fetchAccountByUserId } from "@/hooks/account-hook";
+import {
+  fetchMonthlyExpenseByAccountId,
+  fetchOverallExpenseByAccountId,
+  fetchOverallIncomeByAccountId,
+} from "@/hooks/transaction-hook";
+import { fetchMonthlyBudgetByAccountId } from "@/hooks/budget-hook";
 
 export default function Page({
   params,
@@ -34,54 +40,17 @@ export default function Page({
 
   const { data: session } = authClient.useSession();
 
-  const {
-    data: account,
-    isPending,
-    isFetched,
-  } = api.account.getAccountByUserId.useQuery(
-    {
-      user_id: session?.user.id ?? "",
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id && !!session?.user.id,
-    },
+  const { account, isPending, isFetched } = fetchAccountByUserId(
+    session?.user.id ?? "",
+    param?.id ?? "",
   );
-  const { data: monthlyBudget } = api.budget.getMonthlyBudget.useQuery(
-    {
-      user_account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id,
-    },
-  );
+  const { monthlyBudget } = fetchMonthlyBudgetByAccountId(param?.id ?? "");
 
-  const { data: monthlyExpense } = api.transaction.getMonthlyExpense.useQuery(
-    {
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id,
-    },
-  );
+  const { monthlyExpense } = fetchMonthlyExpenseByAccountId(param?.id ?? "");
 
-  const { data: overallIncome } = api.transaction.getOverallIncome.useQuery(
-    {
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id,
-    },
-  );
+  const { overallIncome } = fetchOverallIncomeByAccountId(param?.id ?? "");
 
-  const { data: overallExpense } = api.transaction.getOverallExpense.useQuery(
-    {
-      account_id: param?.id ?? "",
-    },
-    {
-      enabled: !!param?.id,
-    },
-  );
+  const { overallExpense } = fetchOverallExpenseByAccountId(param?.id ?? "");
 
   if (
     (!param?.id || !session?.user.id || !account) &&

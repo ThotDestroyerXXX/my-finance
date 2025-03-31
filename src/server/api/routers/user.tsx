@@ -17,6 +17,7 @@ export const userRouter = createTRPCRouter({
         .where(
           or(eq(category.user_id, input.user_id), isNull(category.user_id)),
         )
+        .orderBy(category.user_id, category.id)
         .execute();
     }),
 });

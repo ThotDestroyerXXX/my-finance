@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import DropdownDeleteEdit from "./dropdown-delete-edit";
+import { DeleteAlert } from "./delete-alert";
 
 export default function TransactionTable({
   transactions,
@@ -115,12 +116,38 @@ export default function TransactionTable({
                       <TableCell>
                         {transaction.transaction.transaction_type}
                       </TableCell>
-                      <DropdownDeleteEdit
-                        account_id={account_id}
-                        transaction={transaction.transaction}
-                        setLoading={setLoading}
-                        user_id={user_id}
-                      />
+                      <TableCell>
+                        <DropdownDeleteEdit
+                          editContent={
+                            <AddTransaction
+                              account_id={account_id}
+                              amount={transaction.transaction.amount}
+                              category_id={transaction.transaction.category_id.toString()}
+                              description={
+                                transaction.transaction.description ?? undefined
+                              }
+                              isUpdate={true}
+                              placeholder="Update"
+                              transaction_date={
+                                transaction.transaction.transaction_date
+                              }
+                              transaction_id={transaction.transaction.id}
+                              transaction_type={
+                                transaction.transaction.transaction_type
+                              }
+                              user_id={user_id}
+                              setLoading={setLoading}
+                            />
+                          }
+                          deleteContent={
+                            <DeleteAlert
+                              transaction_id={transaction.transaction.id}
+                              account_id={account_id}
+                              setLoading={setLoading}
+                            />
+                          }
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
               </TableBody>
