@@ -167,13 +167,17 @@ export const transactionRouter = createTRPCRouter({
           .where(eq(user_account.id, input.account_id))
           .execute();
 
+        const newDate = new Date(
+          input.date.toLocaleDateString() + "Z",
+        ).toLocaleDateString();
+
         return await ctx.db
           .insert(transaction)
           .values({
             id: input.id,
             amount: input.amount,
             description: input.description,
-            transaction_date: input.date.toLocaleDateString(),
+            transaction_date: newDate,
             transaction_type: input.transaction_type,
             category_id: Number(input.category_id),
             user_account_id: input.account_id,
@@ -285,12 +289,16 @@ export const transactionRouter = createTRPCRouter({
           .where(eq(user_account.id, input.account_id))
           .execute();
 
+        const newDate = new Date(
+          input.transaction_date.toLocaleDateString() + "Z",
+        ).toLocaleDateString();
+
         return await ctx.db
           .update(transaction)
           .set({
             amount: input.amount,
             description: input.description,
-            transaction_date: input.transaction_date.toLocaleDateString(),
+            transaction_date: newDate,
             transaction_type: input.transaction_type,
             category_id: Number(input.category_id),
           })
