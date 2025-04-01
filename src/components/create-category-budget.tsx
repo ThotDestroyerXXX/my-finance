@@ -58,6 +58,7 @@ export default function CreateCategoryBudget({
     setLoading,
     setOpen,
   );
+  const [selectOpen, setSelectOpen] = useState(false);
 
   if (isError) {
     toast.error("Error fetching category types");
@@ -164,7 +165,20 @@ export default function CreateCategoryBudget({
                 <Label htmlFor="category" className="text-right">
                   Category
                 </Label>
-                <Select name="category" defaultValue={category_id}>
+                <Select
+                  name="category"
+                  defaultValue={category_id}
+                  open={selectOpen}
+                  onOpenChange={() => setSelectOpen(true)}
+                  defaultOpen={false}
+                  onValueChange={(value) => {
+                    if (isNaN(Number(value))) {
+                      setSelectOpen(true);
+                    } else {
+                      setSelectOpen(false);
+                    }
+                  }}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Transaction Type" />
                   </SelectTrigger>

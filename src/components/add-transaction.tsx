@@ -14,6 +14,7 @@ import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -68,6 +69,7 @@ export default function AddTransaction({
   );
 
   const [open, setOpen] = useState<boolean>(false);
+  const [selectOpen, setSelectOpen] = useState(false);
 
   const { createIncome } = handleSubmitCreateIncome(setLoading, setOpen);
 
@@ -167,12 +169,32 @@ export default function AddTransaction({
                 <Label htmlFor="category" className="text-right">
                   Category
                 </Label>
-                <Select name="category" defaultValue={category_id}>
+                <Select
+                  name="category"
+                  defaultValue={category_id}
+                  open={selectOpen}
+                  onOpenChange={() => setSelectOpen(true)}
+                  defaultOpen={false}
+                  onValueChange={(value) => {
+                    if (isNaN(Number(value))) {
+                      setSelectOpen(true);
+                    } else {
+                      setSelectOpen(false);
+                    }
+                  }}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Transaction Type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <AddCategory user_id={user_id} setLoading={setLoading} />
+
+                  <SelectContent
+                    onCloseAutoFocus={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <SelectGroup>
+                      <AddCategory user_id={user_id} setLoading={setLoading} />
+                    </SelectGroup>
                     {categoryTypes?.map((category) => (
                       <div
                         key={category.id}

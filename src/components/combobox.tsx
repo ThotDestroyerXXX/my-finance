@@ -30,7 +30,7 @@ export function ComboboxDemo({
   const [value, setValue] = React.useState(defaultValue ?? "");
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <Button
           variant="outline"

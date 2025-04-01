@@ -43,18 +43,14 @@ export default function AddCategory({
   const { handleCreate } = createCategory(setLoading, setDialogOpen);
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen} modal>
       <DialogTrigger asChild>
         {isUpdate ? (
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             {placeholder ?? "Add"}
           </DropdownMenuItem>
         ) : (
-          <Button
-            className="w-full"
-            variant="ghost"
-            onSelect={(e) => e.preventDefault()}
-          >
+          <Button className="w-full" variant="ghost">
             <IconPlus />
             {placeholder ?? "Add"} Category
           </Button>
