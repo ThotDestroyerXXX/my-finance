@@ -10,6 +10,10 @@ export function currency(value: number) {
   return new Intl.NumberFormat().format(value);
 }
 
+export function getTimeZone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 export function calculateBar(
   value: string | number | undefined,
   total: string,

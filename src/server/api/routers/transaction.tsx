@@ -4,6 +4,8 @@ import { transaction, user_account, category } from "@/server/db/schema";
 import { eq, desc, sum, and, sql } from "drizzle-orm";
 import { toast } from "sonner";
 import { maxNum } from "@/lib/interface";
+import { formatInTimeZone } from "date-fns-tz";
+import { getTimeZone } from "@/lib/utils";
 
 export const transactionRouter = createTRPCRouter({
   getAccountIncomeByUserId: publicProcedure
@@ -167,9 +169,11 @@ export const transactionRouter = createTRPCRouter({
           .where(eq(user_account.id, input.account_id))
           .execute();
 
-        const newDate = new Date(
-          input.date.toLocaleDateString() + "Z",
-        ).toLocaleDateString();
+        const newDate = formatInTimeZone(
+          input.date,
+          getTimeZone(),
+          "yyyy-MM-dd",
+        );
 
         return await ctx.db
           .insert(transaction)
@@ -289,9 +293,11 @@ export const transactionRouter = createTRPCRouter({
           .where(eq(user_account.id, input.account_id))
           .execute();
 
-        const newDate = new Date(
-          input.transaction_date.toLocaleDateString() + "Z",
-        ).toLocaleDateString();
+        const newDate = formatInTimeZone(
+          input.transaction_date,
+          getTimeZone(),
+          "yyyy-MM-dd",
+        );
 
         return await ctx.db
           .update(transaction)
