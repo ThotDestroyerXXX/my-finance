@@ -175,6 +175,8 @@ export const transactionRouter = createTRPCRouter({
           "yyyy-MM-dd",
         );
 
+        console.log(newDate, getTimeZone());
+
         return await ctx.db
           .insert(transaction)
           .values({
@@ -298,6 +300,8 @@ export const transactionRouter = createTRPCRouter({
           getTimeZone(),
           "yyyy-MM-dd",
         );
+
+        console.log(newDate, getTimeZone());
 
         return await ctx.db
           .update(transaction)
