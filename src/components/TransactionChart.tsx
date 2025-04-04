@@ -49,7 +49,7 @@ export default function TransactionChart({
       expense: item.totalExpense,
       fill: "red",
     })),
-  ];
+  ].reverse();
   const chartConfig = {
     income: {
       label: "Income",

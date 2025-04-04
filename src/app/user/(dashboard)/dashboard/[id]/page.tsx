@@ -1,8 +1,6 @@
 "use client";
 import BalanceCard from "@/components/balance-card";
-import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
-import data from "../data.json";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -15,8 +13,11 @@ import {
   fetchMonthlyExpenseByAccountId,
   fetchOverallExpenseByAccountId,
   fetchOverallIncomeByAccountId,
+  fetchTransactionByAccountId,
 } from "@/hooks/transaction-hook";
 import { fetchMonthlyBudgetByAccountId } from "@/hooks/budget-hook";
+import TransactionTable from "@/components/transaction-table";
+import AddTransaction from "@/components/add-transaction";
 
 export default function Page({
   params,
@@ -51,6 +52,11 @@ export default function Page({
   const { overallIncome } = fetchOverallIncomeByAccountId(param?.id ?? "");
 
   const { overallExpense } = fetchOverallExpenseByAccountId(param?.id ?? "");
+
+  const { transactions } = fetchTransactionByAccountId({
+    user_id: session?.user.id ?? "",
+    account_id: param?.id ?? "",
+  });
 
   if (
     (!param?.id || !session?.user.id || !account) &&
@@ -103,8 +109,30 @@ export default function Page({
                     />
                   </>
                 )}
-
-              <DataTable data={data} />
+              {(!transactions || transactions.length <= 0) &&
+              isFetched &&
+              param?.id &&
+              session?.user.id ? (
+                <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+                  <h2 className="text-xl">You don&apos;t have expense Yet</h2>
+                  <AddTransaction
+                    user_id={session.user.id}
+                    account_id={param.id}
+                    setLoading={setLoading}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4 px-4 lg:px-6">
+                  <TransactionTable
+                    account_id={param?.id}
+                    isFetched={isFetched}
+                    isPending={isPending}
+                    setLoading={setLoading}
+                    user_id={session?.user.id}
+                    transactions={transactions}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

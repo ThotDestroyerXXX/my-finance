@@ -5,9 +5,39 @@ import { eq, desc, sum, and, sql } from "drizzle-orm";
 import { toast } from "sonner";
 import { maxNum } from "@/lib/interface";
 import { formatInTimeZone } from "date-fns-tz";
-import { getTimeZone } from "@/lib/utils";
 
 export const transactionRouter = createTRPCRouter({
+  getAllTransactionByUserId: publicProcedure
+    .input(
+      z.object({
+        user_id: z.string(),
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const transactionData = await ctx.db
+        .select()
+        .from(transaction)
+        .innerJoin(
+          user_account,
+          eq(transaction.user_account_id, user_account.id),
+        )
+        .innerJoin(category, eq(category.id, transaction.category_id))
+        .where(
+          and(
+            eq(user_account.user_id, input.user_id),
+            eq(user_account.id, input.account_id),
+          ),
+        )
+        .orderBy(desc(transaction.transaction_date))
+        .limit(10)
+        .execute();
+      if (!transactionData) {
+        return null;
+      }
+      return transactionData;
+    }),
+
   getAccountIncomeByUserId: publicProcedure
     .input(
       z.object({
@@ -16,6 +46,42 @@ export const transactionRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
+      const account = await ctx.db
+        .select()
+        .from(transaction)
+        .innerJoin(
+          user_account,
+          eq(transaction.user_account_id, user_account.id),
+        )
+        .innerJoin(category, eq(category.id, transaction.category_id))
+        .where(
+          and(
+            eq(user_account.user_id, input.user_id),
+            eq(user_account.id, input.account_id),
+            eq(transaction.transaction_type, "Income"),
+          ),
+        )
+        .orderBy(desc(transaction.transaction_date))
+        .execute();
+      if (!account) {
+        return null;
+      }
+      return account;
+    }),
+
+  getAccountIncomePaginationByUserId: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).nullish(),
+        cursor: z.number().nullish(),
+        user_id: z.string(),
+        account_id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const limit = input.limit ?? 1;
+      const cursor = input.cursor;
+
       const account = await ctx.db
         .select()
         .from(transaction)
