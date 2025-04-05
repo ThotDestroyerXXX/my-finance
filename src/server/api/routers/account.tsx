@@ -7,8 +7,7 @@ import {
   user_account_type,
 } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
-import { toast } from "sonner";
-import { maxNum } from "@/lib/interface";
+import { checkNumber, formatError } from "@/lib/utils";
 
 export const accountRouter = createTRPCRouter({
   getAccountList: publicProcedure
@@ -48,10 +47,7 @@ export const accountRouter = createTRPCRouter({
             ),
         })
         .execute();
-      if (!account) {
-        return null;
-      }
-      return account;
+      return account ?? null;
     }),
   createAccount: publicProcedure
     .input(
@@ -72,15 +68,10 @@ export const accountRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (isNaN(Number(input.balance))) {
-          throw new Error("Balance must be a number!");
-        }
-        if (Number(input.balance) < 0) {
-          throw new Error("Balance must be greater than 0!");
-        }
-        if (Number(input.balance) >= maxNum) {
-          throw new Error("Balance must be less than 1.000.000.000.000.000");
-        }
+        checkNumber({
+          value: input.balance,
+          placeholder: "Balance",
+        });
         return ctx.db
           .insert(user_account)
           .values({
@@ -93,14 +84,7 @@ export const accountRouter = createTRPCRouter({
           })
           .execute();
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          toast.error(e.errors?.[0]?.message);
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -116,15 +100,10 @@ export const accountRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (isNaN(Number(input.balance))) {
-          throw new Error("Balance must be a number!");
-        }
-        if (Number(input.balance) < 0) {
-          throw new Error("Balance must be greater than 0!");
-        }
-        if (Number(input.balance) >= maxNum) {
-          throw new Error("Balance must be less than 1.000.000.000.000.000");
-        }
+        checkNumber({
+          value: input.balance,
+          placeholder: "Balance",
+        });
         return ctx.db
           .update(user_account)
           .set({
@@ -136,14 +115,7 @@ export const accountRouter = createTRPCRouter({
           .where(eq(user_account.id, input.id))
           .execute();
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          toast.error(e.errors?.[0]?.message);
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 

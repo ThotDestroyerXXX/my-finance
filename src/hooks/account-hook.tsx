@@ -1,3 +1,4 @@
+import { showErrorMessage } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { getParamByISO } from "iso-country-currency";
 import { redirect } from "next/navigation";
@@ -33,10 +34,7 @@ export const useCreateAccount = (
   const utils = api.useUtils();
   const { mutate } = api.account.createAccount.useMutation({
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
     onMutate: () => {
@@ -44,7 +42,7 @@ export const useCreateAccount = (
       setLoading(true);
     },
     onSuccess: async () => {
-      await utils.account.getAccountList.invalidate();
+      await utils.invalidate();
       setOpen(false);
       setLoading(false);
       toast.success("Account created successfully");
@@ -53,10 +51,7 @@ export const useCreateAccount = (
 
   const { mutate: mutateUpdate } = api.account.updateAccount.useMutation({
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
     onMutate: () => {
@@ -64,7 +59,7 @@ export const useCreateAccount = (
       setLoading(true);
     },
     onSuccess: async () => {
-      await utils.account.getAccountList.invalidate();
+      await utils.invalidate();
       setOpen(false);
       setLoading(false);
       toast.success("Account updated successfully");
@@ -151,16 +146,11 @@ export const handleSubmitCreateIncome = (
       setLoading(true);
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
     onSuccess: async () => {
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
-      await utils.budget.invalidate();
+      await utils.invalidate();
       setOpen(false);
       setLoading(false);
       toast.success("Transaction created successfully");
@@ -174,16 +164,11 @@ export const handleSubmitCreateIncome = (
         setLoading(true);
       },
       onError: (error) => {
-        const errorMessages = error.data?.zodError?.fieldErrors
-          ? Object.values(error.data.zodError.fieldErrors).flat()
-          : [error.message];
-        errorMessages.forEach((msg) => toast.error(msg));
+        showErrorMessage(error);
         setLoading(false);
       },
       onSuccess: async () => {
-        await utils.transaction.invalidate();
-        await utils.account.invalidate();
-        await utils.budget.invalidate();
+        await utils.invalidate();
         setOpen(false);
         setLoading(false);
         toast.success("Transaction updated successfully");
@@ -245,9 +230,7 @@ export const deleteTransaction = (setLoading: (loading: boolean) => void) => {
       toast.error(error.message);
     },
     onSuccess: async () => {
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
-      await utils.budget.invalidate();
+      await utils.invalidate();
       toast.success("Transaction deleted successfully");
       setLoading(false);
     },
@@ -263,9 +246,7 @@ export const deleteTransaction = (setLoading: (loading: boolean) => void) => {
       toast.error(error.message);
     },
     onSuccess: async () => {
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
-      await utils.budget.invalidate();
+      await utils.invalidate();
       toast.success("Budget deleted successfully");
       setLoading(false);
     },
@@ -302,9 +283,7 @@ export const handleDeleteAccount = (setLoading: (loading: boolean) => void) => {
       toast.error(error.message);
     },
     onSuccess: async () => {
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
-      await utils.budget.invalidate();
+      await utils.invalidate();
       toast.success("Account deleted successfully");
       setLoading(false);
     },

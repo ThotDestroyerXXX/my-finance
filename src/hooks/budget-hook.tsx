@@ -1,3 +1,4 @@
+import { showErrorMessage } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -13,17 +14,13 @@ export function handleSubmitMonthlyBudget(
       toast.info("Creating budget...");
     },
     onSuccess: async () => {
-      await utils.budget.invalidate();
-      await utils.account.invalidate();
+      await utils.invalidate();
       setOpen(false);
       setLoading(false);
       toast.success("Budget created successfully");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
   });
@@ -34,17 +31,13 @@ export function handleSubmitMonthlyBudget(
       toast.info("Updating budget...");
     },
     onSuccess: async () => {
-      await utils.budget.invalidate();
-      await utils.account.invalidate();
+      await utils.invalidate();
       setOpen(false);
       setLoading(false);
       toast.success("Budget updated successfully");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
   });
@@ -88,17 +81,13 @@ export function handleSubmitCategoryBudget(
       toast.info("Creating category budget...");
     },
     onSuccess: async () => {
-      await utils.budget.invalidate();
-      await utils.user.invalidate();
+      await utils.invalidate();
       setLoading(false);
       setOpen(false);
       toast.success("Category budget created successfully");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
   });
@@ -109,17 +98,13 @@ export function handleSubmitCategoryBudget(
       toast.info("Updating category budget...");
     },
     onSuccess: async () => {
-      await utils.budget.invalidate();
-      await utils.user.invalidate();
+      await utils.invalidate();
       setLoading(false);
       setOpen(false);
       toast.success("Category budget updated successfully");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
   });
@@ -164,16 +149,12 @@ export const handleDeleteCategoryBudget = (
       toast.info("Deleting category budget...");
     },
     onSuccess: async () => {
-      await utils.budget.invalidate();
-      await utils.user.invalidate();
+      await utils.invalidate();
       setLoading(false);
       toast.success("Category budget deleted successfully");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
   });

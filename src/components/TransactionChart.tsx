@@ -38,18 +38,42 @@ export default function TransactionChart({
   }[];
 }>) {
   const [days, setDays] = useState<number | string>(90);
-  const chartData = [
-    ...income.map((item) => ({
-      date: item.transaction_date,
-      income: item.totalIncome,
-      fill: "green",
-    })),
-    ...expense.map((item) => ({
-      date: item.transaction_date,
-      expense: item.totalExpense,
-      fill: "red",
-    })),
-  ].reverse();
+  const normalizedIncome = income.map((item) => ({
+    date: item.transaction_date,
+    income: item.totalIncome,
+    expense: null, // No expense for income entries
+  }));
+
+  const normalizedExpense = expense.map((item) => ({
+    date: item.transaction_date,
+    income: null, // No income for expense entries
+    expense: item.totalExpense,
+  }));
+
+  const combinedData = [...normalizedIncome, ...normalizedExpense].reduce(
+    (acc, item) => {
+      const existing = acc.find((entry) => entry.date === item.date);
+
+      if (existing) {
+        // Merge income and expense for the same date
+        if (item.income) {
+          existing.income = item.income;
+        }
+        if (item.expense) {
+          existing.expense = item.expense;
+        }
+      } else {
+        // Add a new entry
+        acc.push(item);
+      }
+
+      return acc;
+    },
+    [] as { date: string; income: string | null; expense: string | null }[],
+  );
+
+  // Reverse the data to maintain the original order
+  const chartData = combinedData.slice().reverse();
   const chartConfig = {
     income: {
       label: "Income",
@@ -133,14 +157,12 @@ export default function TransactionChart({
               type="natural"
               fill="url(#fillMobile)"
               stroke="green"
-              stackId="a"
             />
             <Area
               dataKey="expense"
               type="natural"
               fill="url(#fillDesktop)"
               stroke="red"
-              stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>

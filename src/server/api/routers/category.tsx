@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { category, category_budget, transaction } from "@/server/db/schema";
 import { and, eq } from "drizzle-orm";
+import { formatError } from "@/lib/utils";
 
 export const categoryRouter = createTRPCRouter({
   createCategory: publicProcedure
@@ -24,13 +25,7 @@ export const categoryRouter = createTRPCRouter({
         });
         return newCategory;
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -62,13 +57,7 @@ export const categoryRouter = createTRPCRouter({
           );
         return updatedCategory;
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -98,13 +87,7 @@ export const categoryRouter = createTRPCRouter({
             ),
           );
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 });

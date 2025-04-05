@@ -1,3 +1,4 @@
+import { showErrorMessage } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 
@@ -12,17 +13,11 @@ export const createCategory = (
       toast.info("Creating category...");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
     onSuccess: async () => {
-      await utils.user.invalidate();
-      await utils.category.invalidate();
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
+      await utils.invalidate();
       toast.success("Category created successfully");
       setLoading(false);
       setDialogOpen(false);
@@ -35,17 +30,11 @@ export const createCategory = (
       toast.info("Updating category...");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
     onSuccess: async () => {
-      await utils.user.invalidate();
-      await utils.category.invalidate();
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
+      await utils.invalidate();
       toast.success("Category updated successfully");
       setLoading(false);
       setDialogOpen(false);
@@ -88,18 +77,11 @@ export const handleDeleteCategory = (
       toast.info("Deleting category...");
     },
     onError: (error) => {
-      const errorMessages = error.data?.zodError?.fieldErrors
-        ? Object.values(error.data.zodError.fieldErrors).flat()
-        : [error.message];
-      errorMessages.forEach((msg) => toast.error(msg));
+      showErrorMessage(error);
       setLoading(false);
     },
     onSuccess: async () => {
-      await utils.user.invalidate();
-      await utils.category.invalidate();
-      await utils.transaction.invalidate();
-      await utils.account.invalidate();
-      await utils.budget.invalidate();
+      await utils.invalidate();
       toast.success("Category deleted successfully");
       setLoading(false);
     },

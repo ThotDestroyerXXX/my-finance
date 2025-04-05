@@ -8,7 +8,7 @@ import {
   user,
 } from "@/server/db/schema";
 import { and, eq, sum } from "drizzle-orm";
-import { maxNum } from "@/lib/interface";
+import { checkNumber, formatError } from "@/lib/utils";
 
 export const budgetRouter = createTRPCRouter({
   createBudget: publicProcedure
@@ -21,17 +21,10 @@ export const budgetRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (isNaN(Number(input.amount_limit))) {
-          throw new Error("Amount must be a number!");
-        }
-        if (
-          Number(input.amount_limit) <= 0 ||
-          Number(input.amount_limit) >= maxNum
-        ) {
-          throw new Error(
-            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
-          );
-        }
+        checkNumber({
+          value: input.amount_limit,
+          placeholder: "Amount",
+        });
         const budget = await ctx.db.insert(monthly_budget).values({
           id: input.id,
           user_account_id: input.user_account_id,
@@ -39,13 +32,7 @@ export const budgetRouter = createTRPCRouter({
         });
         return budget;
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -59,17 +46,10 @@ export const budgetRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (isNaN(Number(input.amount_limit))) {
-          throw new Error("Amount must be a number!");
-        }
-        if (
-          Number(input.amount_limit) <= 0 ||
-          Number(input.amount_limit) >= maxNum
-        ) {
-          throw new Error(
-            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
-          );
-        }
+        checkNumber({
+          value: input.amount_limit,
+          placeholder: "Amount",
+        });
         return await ctx.db
           .update(monthly_budget)
           .set({
@@ -82,13 +62,7 @@ export const budgetRouter = createTRPCRouter({
             ),
           );
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -104,13 +78,7 @@ export const budgetRouter = createTRPCRouter({
           .delete(monthly_budget)
           .where(eq(monthly_budget.id, input.id));
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -125,10 +93,7 @@ export const budgetRouter = createTRPCRouter({
         where: (fields, operators) =>
           operators.and(eq(fields.user_account_id, input.user_account_id)),
       });
-      if (!budget) {
-        return null;
-      }
-      return budget;
+      return budget ?? null;
     }),
 
   createCategoryBudget: publicProcedure
@@ -142,17 +107,10 @@ export const budgetRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (isNaN(Number(input.amount_limit))) {
-          throw new Error("Amount must be a number!");
-        }
-        if (
-          Number(input.amount_limit) <= 0 ||
-          Number(input.amount_limit) >= maxNum
-        ) {
-          throw new Error(
-            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
-          );
-        }
+        checkNumber({
+          value: input.amount_limit,
+          placeholder: "Amount",
+        });
         const existingBudget = await ctx.db.query.category_budget.findFirst({
           where: (fields, operators) =>
             operators.and(
@@ -181,13 +139,7 @@ export const budgetRouter = createTRPCRouter({
         });
         return budget;
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -211,10 +163,7 @@ export const budgetRouter = createTRPCRouter({
         .groupBy(category_budget.id, category.id, user.id)
         .where(eq(user.id, input.user_id))
         .execute();
-      if (!budget) {
-        return null;
-      }
-      return budget;
+      return budget ?? null;
     }),
 
   updateCategoryBudget: publicProcedure
@@ -228,17 +177,10 @@ export const budgetRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (isNaN(Number(input.amount_limit))) {
-          throw new Error("Amount must be a number!");
-        }
-        if (
-          Number(input.amount_limit) <= 0 ||
-          Number(input.amount_limit) >= maxNum
-        ) {
-          throw new Error(
-            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
-          );
-        }
+        checkNumber({
+          value: input.amount_limit,
+          placeholder: "Amount",
+        });
 
         const existingBudget = await ctx.db.query.category_budget.findFirst({
           where: (fields, operators) =>
@@ -264,18 +206,9 @@ export const budgetRouter = createTRPCRouter({
             ),
           )
           .execute();
-        if (!budget) {
-          return null;
-        }
-        return budget;
+        return budget ?? null;
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -291,13 +224,7 @@ export const budgetRouter = createTRPCRouter({
           .delete(category_budget)
           .where(eq(category_budget.id, input.id));
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 });

@@ -2,9 +2,9 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { transaction, user_account, category } from "@/server/db/schema";
 import { eq, desc, sum, and, sql } from "drizzle-orm";
-import { toast } from "sonner";
 import { maxNum } from "@/lib/interface";
 import { formatInTimeZone } from "date-fns-tz";
+import { checkNumber, formatError, updateBalance } from "@/lib/utils";
 
 export const transactionRouter = createTRPCRouter({
   getAllTransactionByUserId: publicProcedure
@@ -32,10 +32,7 @@ export const transactionRouter = createTRPCRouter({
         .orderBy(desc(transaction.transaction_date))
         .limit(10)
         .execute();
-      if (!transactionData) {
-        return null;
-      }
-      return transactionData;
+      return transactionData ?? null;
     }),
 
   getAccountIncomeByUserId: publicProcedure
@@ -63,46 +60,7 @@ export const transactionRouter = createTRPCRouter({
         )
         .orderBy(desc(transaction.transaction_date))
         .execute();
-      if (!account) {
-        return null;
-      }
-      return account;
-    }),
-
-  getAccountIncomePaginationByUserId: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().min(1).max(100).nullish(),
-        cursor: z.number().nullish(),
-        user_id: z.string(),
-        account_id: z.string(),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const limit = input.limit ?? 1;
-      const cursor = input.cursor;
-
-      const account = await ctx.db
-        .select()
-        .from(transaction)
-        .innerJoin(
-          user_account,
-          eq(transaction.user_account_id, user_account.id),
-        )
-        .innerJoin(category, eq(category.id, transaction.category_id))
-        .where(
-          and(
-            eq(user_account.user_id, input.user_id),
-            eq(user_account.id, input.account_id),
-            eq(transaction.transaction_type, "Income"),
-          ),
-        )
-        .orderBy(desc(transaction.transaction_date))
-        .execute();
-      if (!account) {
-        return null;
-      }
-      return account;
+      return account ?? null;
     }),
 
   getAccountExpenseByUserId: publicProcedure
@@ -130,10 +88,7 @@ export const transactionRouter = createTRPCRouter({
         )
         .orderBy(desc(transaction.transaction_date))
         .execute();
-      if (!account) {
-        return null;
-      }
-      return account;
+      return account ?? null;
     }),
 
   getTotalIncome: publicProcedure
@@ -164,10 +119,7 @@ export const transactionRouter = createTRPCRouter({
           ),
         )
         .execute();
-      if (!totalIncome) {
-        return null;
-      }
-      return totalIncome;
+      return totalIncome ?? null;
     }),
 
   createIncome: publicProcedure
@@ -193,14 +145,10 @@ export const transactionRouter = createTRPCRouter({
         ) {
           throw new Error("Transaction type must be either Income or Expense");
         }
-        if (isNaN(Number(input.amount))) {
-          throw new Error("Amount must be a number");
-        }
-        if (Number(input.amount) <= 0 || Number(input.amount) >= maxNum) {
-          throw new Error(
-            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
-          );
-        }
+        checkNumber({
+          value: input.amount,
+          placeholder: "Amount",
+        });
         if (isNaN(Number(input.category_id))) {
           throw new Error("Category not found");
         }
@@ -254,14 +202,7 @@ export const transactionRouter = createTRPCRouter({
           })
           .execute();
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          toast.error(e.errors?.[0]?.message);
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -289,14 +230,10 @@ export const transactionRouter = createTRPCRouter({
         ) {
           throw new Error("Transaction type must be either Income or Expense");
         }
-        if (isNaN(Number(input.amount))) {
-          throw new Error("Amount must be a number");
-        }
-        if (Number(input.amount) <= 0 || Number(input.amount) >= maxNum) {
-          throw new Error(
-            "Amount must be greater than 0 and less than 1.000.000.000.000.000",
-          );
-        }
+        checkNumber({
+          value: input.amount,
+          placeholder: "Amount",
+        });
         if (isNaN(Number(input.category_id))) {
           throw new Error("Category not found");
         }
@@ -317,34 +254,13 @@ export const transactionRouter = createTRPCRouter({
         }
         const oldAmount = Number(transactionFind.amount);
         let newBalance = 0;
-        if (
-          input.transaction_type === "Income" &&
-          transactionFind.transaction_type === "Income"
-        ) {
-          newBalance =
-            Number(acc.balance) - Number(oldAmount) + Number(input.amount);
-        }
-        if (
-          input.transaction_type === "Expense" &&
-          transactionFind.transaction_type === "Expense"
-        ) {
-          newBalance =
-            Number(acc.balance) + Number(oldAmount) - Number(input.amount);
-        }
-        if (
-          input.transaction_type === "Income" &&
-          transactionFind.transaction_type === "Expense"
-        ) {
-          newBalance =
-            Number(acc.balance) + Number(input.amount) + Number(oldAmount);
-        }
-        if (
-          input.transaction_type === "Expense" &&
-          transactionFind.transaction_type === "Income"
-        ) {
-          newBalance =
-            Number(acc.balance) - Number(input.amount) - Number(oldAmount);
-        }
+        newBalance = updateBalance({
+          inputTransactionType: input.transaction_type,
+          transactionTransactionType: transactionFind.transaction_type,
+          balance: acc.balance,
+          oldAmount: oldAmount,
+          inputAmount: input.amount,
+        });
         if (Number(newBalance) >= maxNum) {
           throw new Error("Balance limit exceeded");
         }
@@ -377,14 +293,7 @@ export const transactionRouter = createTRPCRouter({
           .where(eq(transaction.id, input.transaction_id))
           .execute();
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          toast.error(e.errors?.[0]?.message);
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
 
@@ -437,14 +346,7 @@ export const transactionRouter = createTRPCRouter({
           )
           .execute();
       } catch (e) {
-        if (e instanceof z.ZodError) {
-          toast.error(e.errors?.[0]?.message);
-          throw new Error(e.errors.map((issue) => issue.message).join(", "));
-        }
-        if (e instanceof Error) {
-          throw new Error(e.message);
-        }
-        throw new Error("An unknown error occurred");
+        formatError(e);
       }
     }),
   getMonthlyExpense: publicProcedure
@@ -472,9 +374,6 @@ export const transactionRouter = createTRPCRouter({
           ),
         )
         .execute();
-      if (!expense) {
-        return 0;
-      }
       return expense[0]?.totalExpense ?? 0;
     }),
 
@@ -503,9 +402,6 @@ export const transactionRouter = createTRPCRouter({
           ),
         )
         .execute();
-      if (!income) {
-        return 0;
-      }
       return income[0]?.totalIncome ?? 0;
     }),
 
@@ -536,10 +432,7 @@ export const transactionRouter = createTRPCRouter({
         )
 
         .execute();
-      if (!income) {
-        return null;
-      }
-      return income;
+      return income ?? null;
     }),
 
   getOverallExpense: publicProcedure
@@ -563,9 +456,6 @@ export const transactionRouter = createTRPCRouter({
           ),
         )
         .execute();
-      if (!expense) {
-        return null;
-      }
-      return expense;
+      return expense ?? null;
     }),
 });
