@@ -72,8 +72,15 @@ export default function TransactionChart({
     [] as { date: string; income: string | null; expense: string | null }[],
   );
 
-  // Reverse the data to maintain the original order
-  const chartData = combinedData.slice().reverse();
+  // Sort the combined data by date in ascending order
+  const sortedData = combinedData.slice().sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateA - dateB; // Ascending order
+  });
+
+  // Reverse the data to maintain the original order if needed
+  const chartData = sortedData;
   const chartConfig = {
     income: {
       label: "Income",

@@ -66,6 +66,7 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",
     "react-input-emoji": "^5.9.0",
+    "react-scan": "^0.3.3",
     "recharts": "^2.15.1",
     "server-only": "^0.0.1",
     "sonner": "^2.0.1",
