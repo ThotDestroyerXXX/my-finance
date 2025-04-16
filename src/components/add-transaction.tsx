@@ -26,7 +26,7 @@ import { Textarea } from "./ui/textarea";
 import { Calendar } from "./ui/calendar";
 import { Popover } from "./ui/popover";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { handleSubmitCreateIncome } from "@/hooks/account-hook";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
@@ -63,6 +63,8 @@ export default function AddTransaction({
 }: Readonly<TransactionProps>) {
   const { categoryTypes, isPending, isFetched, isError } =
     fetchCategoryTypeByUserId(user_id ?? "");
+
+  const memoizedCategoryTypes = useMemo(() => categoryTypes, [categoryTypes]);
 
   const [date, setDate] = useState<Date | null>(
     transaction_date ? new Date(transaction_date) : null,
@@ -195,7 +197,7 @@ export default function AddTransaction({
                     <SelectGroup>
                       <AddCategory user_id={user_id} setLoading={setLoading} />
                     </SelectGroup>
-                    {categoryTypes?.map((category) => (
+                    {memoizedCategoryTypes?.map((category) => (
                       <div
                         key={category.id}
                         className="hover:bg-accent hover:text-accent-foreground flex w-full cursor-pointer flex-row items-center justify-between rounded-sm px-2 py-1"

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { eachDayOfInterval, format } from "date-fns";
 
 export default function TransactionChart({
   income,
@@ -38,16 +39,17 @@ export default function TransactionChart({
   }[];
 }>) {
   const [days, setDays] = useState<number | string>(90);
+
   const normalizedIncome = income.map((item) => ({
     date: item.transaction_date,
-    income: item.totalIncome,
-    expense: null, // No expense for income entries
+    income: Number(item.totalIncome) || 0,
+    expense: 0, // No expense for income entries
   }));
 
   const normalizedExpense = expense.map((item) => ({
     date: item.transaction_date,
-    income: null, // No income for expense entries
-    expense: item.totalExpense,
+    income: 0, // No income for expense entries
+    expense: Number(item.totalExpense) || 0,
   }));
 
   const combinedData = [...normalizedIncome, ...normalizedExpense].reduce(
@@ -56,12 +58,8 @@ export default function TransactionChart({
 
       if (existing) {
         // Merge income and expense for the same date
-        if (item.income) {
-          existing.income = item.income;
-        }
-        if (item.expense) {
-          existing.expense = item.expense;
-        }
+        existing.income += item.income;
+        existing.expense += item.expense;
       } else {
         // Add a new entry
         acc.push(item);
@@ -69,18 +67,19 @@ export default function TransactionChart({
 
       return acc;
     },
-    [] as { date: string; income: string | null; expense: string | null }[],
+    [] as { date: string; income: number; expense: number }[],
   );
 
+  const dateRange = eachDayOfInterval({
+    start: new Date(
+      Math.min(...combinedData.map((item) => new Date(item.date).getTime())),
+    ),
+    end: new Date(),
+  }).map((date) => format(date, "yyyy-MM-dd"));
+
   // Sort the combined data by date in ascending order
-  const sortedData = combinedData.slice().sort((a, b) => {
-    const dateA = new Date(a.date).getTime();
-    const dateB = new Date(b.date).getTime();
-    return dateA - dateB; // Ascending order
-  });
 
   // Reverse the data to maintain the original order if needed
-  const chartData = sortedData;
   const chartConfig = {
     income: {
       label: "Income",
@@ -90,7 +89,24 @@ export default function TransactionChart({
     },
   } satisfies ChartConfig;
 
-  const filteredData = chartData.filter((item) => {
+  const filledData = dateRange.map((date) => {
+    const existing = combinedData.find((item) => item.date === date);
+    return (
+      existing ?? {
+        date,
+        income: 0,
+        expense: 0,
+      }
+    );
+  });
+
+  const sortedData = filledData.slice().sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateA - dateB; // Ascending order
+  });
+
+  const filteredData = sortedData.filter((item) => {
     const date = new Date(item.date);
     const today = new Date();
     if (days === -1) return true; // Overall
@@ -99,6 +115,7 @@ export default function TransactionChart({
     );
     return diffDays <= Number(days); // Filter by days
   });
+
   return (
     <Card>
       <CardHeader className="flex flex-col items-center gap-3 space-y-0 border-b py-5 sm:flex-row">
@@ -155,19 +172,25 @@ export default function TransactionChart({
               tickMargin={8}
               minTickGap={32}
             />
+            <YAxis
+              domain={[0, "auto"]} // Ensure the y-axis starts at 0
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+            />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
               dataKey="income"
-              type="natural"
+              type="monotone"
               fill="url(#fillMobile)"
               stroke="green"
             />
             <Area
               dataKey="expense"
-              type="natural"
+              type="monotone"
               fill="url(#fillDesktop)"
               stroke="red"
             />

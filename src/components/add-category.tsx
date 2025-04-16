@@ -14,7 +14,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createCategory } from "@/hooks/category-hook";
 
 export default function AddCategory({
@@ -36,9 +36,7 @@ export default function AddCategory({
 }>) {
   const [open, setOpen] = useState(false);
   const [iconValue, setIconValue] = useState<string>(icon ?? "");
-  const [categoryNameValue, setCategoryNameValue] = useState<string>(
-    category_name ?? "",
-  );
+  const categoryNameValue = useRef<string>(category_name ?? "");
   const [dialogOpen, setDialogOpen] = useState(false);
   const { handleCreate } = createCategory(setLoading, setDialogOpen);
 
@@ -72,8 +70,8 @@ export default function AddCategory({
             <Input
               name="name"
               placeholder="category name"
-              onChange={(value) => setCategoryNameValue(value.target.value)}
-              defaultValue={categoryNameValue}
+              onChange={(e) => (categoryNameValue.current = e.target.value)}
+              defaultValue={categoryNameValue.current}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -104,7 +102,7 @@ export default function AddCategory({
             onClick={(e) => {
               e.preventDefault();
               handleCreate(
-                categoryNameValue,
+                categoryNameValue.current,
                 iconValue,
                 user_id,
                 isUpdate,

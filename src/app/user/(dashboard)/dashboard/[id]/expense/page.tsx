@@ -9,27 +9,13 @@ import {
 } from "@/hooks/transaction-hook";
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useContext, useState } from "react";
+import { ParamContext } from "../../useContext/context";
 
-export default function Expense({
-  params,
-}: Readonly<{
-  params: Promise<{ id: string }>;
-}>) {
-  const [param, setParam] = useState<{ id: string } | null>(null);
+export default function Expense() {
   const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    const fetchParam = async () => {
-      return await params;
-    };
-    fetchParam()
-      .then((param) => {
-        setParam(param);
-      })
-      .catch(() => {
-        setParam(null);
-      });
-  }, [params]);
+
+  const param = useContext(ParamContext);
 
   const session = authClient.useSession();
   const { expenses, isPending, isFetched } = fetchAccountExpenseByUserId(

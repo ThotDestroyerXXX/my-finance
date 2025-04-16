@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { type Session } from "@/lib/auth";
+import { useContext } from "react";
+import { ParamContext } from "@/app/user/(dashboard)/dashboard/useContext/context";
 
 const data = {
   user: {
@@ -51,14 +53,10 @@ const data = {
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: Session | null;
-  account_id: string;
 }
 
-export function AppSidebar({
-  session,
-  account_id,
-  ...props
-}: Readonly<AppSidebarProps>) {
+export function AppSidebar({ session, ...props }: Readonly<AppSidebarProps>) {
+  const account_id = useContext(ParamContext)?.id;
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -80,7 +78,7 @@ export function AppSidebar({
         {/* {session?.session && (
           <> */}
 
-        <NavMain items={data.navMain} account_id={account_id} />
+        <NavMain items={data.navMain} account_id={account_id ?? ""} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
         {/* </>
         )} */}

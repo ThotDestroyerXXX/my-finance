@@ -10,27 +10,13 @@ import {
 } from "@/hooks/budget-hook";
 import { fetchMonthlyExpenseByAccountId } from "@/hooks/transaction-hook";
 import { authClient } from "@/lib/auth-client";
-import { useEffect, useState } from "react";
+import { useState, useContext } from "react";
+import { ParamContext } from "../../useContext/context";
 
-export default function Budget({
-  params,
-}: Readonly<{
-  params: Promise<{ id: string }>;
-}>) {
-  const [param, setParam] = useState<{ id: string } | null>(null);
+export default function Budget() {
   const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    const fetchParam = async () => {
-      return await params;
-    };
-    fetchParam()
-      .then((param) => {
-        setParam(param);
-      })
-      .catch(() => {
-        setParam(null);
-      });
-  }, [params]);
+
+  const param = useContext(ParamContext);
   const session = authClient.useSession();
   const { account, isPending, isFetched } = fetchAccountByUserId(
     session.data?.user.id ?? "",

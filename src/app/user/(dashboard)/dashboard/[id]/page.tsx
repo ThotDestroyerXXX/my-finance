@@ -3,7 +3,7 @@ import BalanceCard from "@/components/balance-card";
 import { SectionCards } from "@/components/section-cards";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Spinner from "@/components/ui/spinner";
 import MonthlyBudget from "@/components/monthly-budget";
@@ -18,26 +18,11 @@ import {
 import { fetchMonthlyBudgetByAccountId } from "@/hooks/budget-hook";
 import TransactionTable from "@/components/transaction-table";
 import AddTransaction from "@/components/add-transaction";
+import { ParamContext } from "../useContext/context";
 
-export default function Page({
-  params,
-}: Readonly<{
-  params: Promise<{ id: string }>;
-}>) {
-  const [param, setParam] = useState<{ id: string } | null>(null);
+export default function Page() {
   const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    const fetchParam = async () => {
-      return await params;
-    };
-    fetchParam()
-      .then((param) => {
-        setParam(param);
-      })
-      .catch(() => {
-        setParam(null);
-      });
-  }, [params]);
+  const param = useContext(ParamContext);
 
   const { data: session } = authClient.useSession();
 
